@@ -2,7 +2,12 @@
     "name": "php-etl/zoho-crm",
     "autoload": {
         "psr-4": {
-            "Kiboko\\ZohoCrm\\": "src/"
+            "Kiboko\\ZohoCRM\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kiboko\\ZohoCRM\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -13,9 +18,10 @@
     ],
     "require": {
         "php": "^8.1",
-        "zohocrm/php-sdk": "^3.1",
         "php-etl/pipeline-contracts": "^0.3.3",
-        "php-etl/bucket": "^0.2.0"
+        "php-etl/bucket": "^0.2.0",
+        "zohocrm/php-sdk-3.0": "^1.0@beta",
+        "psr/log": "^3.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
