@@ -51,38 +51,37 @@ final class DealLoader implements LoaderInterface
 
         $line = yield;
         do {
+            $recordOperations = new \com\zoho\crm\api\record\RecordOperations();
+
             $body = new \com\zoho\crm\api\record\BodyWrapper();
+
+            $contact = $recordOperations->getRecord('468784000000394792', 'Contacts')->getObject()->getData()[0];
+            $order = $recordOperations->getRecord('468784000000410925', 'Sales_Orders')->getObject()->getData()[0];
+            $product = $recordOperations->getRecord('468784000000380141', 'Products')->getObject()->getData()[0];
+
+            $record = new \com\zoho\crm\api\record\Record();
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::Amount(), (float) $line['Amount']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::DealName(), $line['Deal_Name']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::Type(), new \com\zoho\crm\api\util\Choice($line['Type']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::ClosingDate(), new \DateTime($line['Closing_Date']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::Stage(), new \com\zoho\crm\api\util\Choice($line['Stage']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Deals::ContactName(), $contact);
+            $record->addKeyValue('Commande_client', $order);
+            $record->addKeyValue('E_mail_de_la_commande', $line['E_mail_de_la_commande']);
+            $record->addKeyValue('Store', new \com\zoho\crm\api\util\Choice($line['Store']));
+            $record->addKeyValue('Libell_promotion', $line['Libell_promotion']);
+            $record->addKeyValue('Produit', $product);
+
             $body->setData(
                 [
-                    [
-                        'Amount' => $line['Amount'],
-                        'Deal_Name' => $line['Deal_Name'],
-                        'Type' => $line['Type'],
-                        'Closing_Date' => $line['Closing_Date'],
-                        'Stage' => $line['Stage'],
-                        'Contact_Name' => $line['Contact_Name'],
-                        'Commande_client' => $line['Commande_client'],
-                        'E_mail_de_la_commande' => $line['E_mail_de_la_commande'],
-                        'Store' => $line['Store'],
-                        'Libell_promotion' => $line['Libell_promotion'],
-                        'Produit' => $line['Produit'],
-                        'Famille_de_Produit' => $line['Famille_de_Produit'],
-                        'Cat_gorie_de_Produit' => $line['Cat_gorie_de_Produit'],
-                        'Collection' => $line['Collection'],
-                        'Prix_unitaire_HT' => $line['Prix_unitaire_HT'],
-                        'Qt' => $line['Qt'],
-                        'Code_produit' => $line['Code_produit'],
-                        'Remise_ligne' => $line['Remise_ligne'],
-                        'TVA_ligne' => $line['TVA_ligne'],
-                    ]
+                    $record
                 ]
             );
 
-            (new \com\zoho\crm\api\record\RecordOperations())
-                ->upsertRecords(
-                    'Potentials',
-                    $body,
-                );
+            $recordOperations->upsertRecords(
+                'Deals',
+                $body,
+            );
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
 }

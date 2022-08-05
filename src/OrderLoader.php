@@ -51,42 +51,41 @@ final class OrderLoader implements LoaderInterface
 
         $line = yield;
         do {
-            $body = new \com\zoho\crm\api\record\BodyWrapper();
-            $body->setData(
-                [
-                    [
-                        'Subject' => $line['Subject'],
-                        'Contact_Name' => $line['Contact_Name'],
-                        'Status' => $line['Status'],
-                        'Tax' => $line['Tax'],
-                        'Billing_Street' => $line['Billing_Street'],
-                        'Billing_Code' => $line['Billing_Code'],
-                        'Billing_City' => $line['Billing_City'],
-                        'Billing_State' => $line['Billing_State'],
-                        'Billing_Country' => $line['Billing_Country'],
-                        'Shipping_Street' => $line['Shipping_Street'],
-                        'Shipping_Code' => $line['Shipping_Code'],
-                        'Shipping_City' => $line['Shipping_City'],
-                        'Shipping_State' => $line['Shipping_State'],
-                        'Shipping_Country' => $line['Shipping_Country'],
-                        'Description' => $line['Description'],
-                        'Store' => $line['Store'],
-                        'Libell_promotion' => $line['Libell_promotion'],
-                        'Date_de_la_commande' => $line['Date_de_la_commande'],
-                        'Contact_de_livraison' => $line['Contact_de_livraison'],
-                        'E_mail_de_la_commande' => $line['E_mail_de_la_commande'],
-                        'Informations_de_livraison' => $line['Informations_de_livraison'],
-                        'Port_et_Manutention' => $line['Port_et_Manutention'],
-                        'Moyen_de_paiement' => $line['Port_et_Manutention'],
-                    ]
-                ]
-            );
+            $recordOperations = new \com\zoho\crm\api\record\RecordOperations();
 
-            (new \com\zoho\crm\api\record\RecordOperations())
-                ->upsertRecords(
-                    'Sales_Orders',
-                    $body,
-                );
+            $body = new \com\zoho\crm\api\record\BodyWrapper();
+
+            $contact = $recordOperations->getRecord($line['Contact_Name'], 'Contacts')->getObject()->getData()[0];
+
+            $record = new \com\zoho\crm\api\record\Record();
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::Subject(), $line['Subject']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ContactName(), $contact);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::Status(), new \com\zoho\crm\api\util\Choice($line['Status']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::Tax(), $line['Tax']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::BillingStreet(), $line['Billing_Street']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::BillingCode(), $line['Billing_Code']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::BillingState(), $line['Billing_State']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::BillingCountry(), $line['Billing_Country']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ShippingStreet(), $line['Shipping_Street']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ShippingCode(), $line['Shipping_Code']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ShippingCity(), $line['Shipping_City']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ShippingState(), $line['Shipping_State']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::ShippingCountry(), $line['Shipping_Country']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::Description(), $line['Description']);
+            $record->addKeyValue('Store', new \com\zoho\crm\api\util\Choice($line['Store']));
+            $record->addKeyValue('Libell_promotion', $line['Libell_promotion']);
+            $record->addKeyValue('Date_de_la_commande', new \DateTime($line['Date_de_la_commande']));
+            $record->addKeyValue('E_mail_de_la_commande', $line['E_mail_de_la_commande']);
+            $record->addKeyValue('Informations_de_livraison', new \com\zoho\crm\api\util\Choice($line['Informations_de_livraison']));
+            $record->addKeyValue('Port_et_Manutention', $line['Port_et_Manutention']);
+            $record->addKeyValue('Moyen_de_paiement', new \com\zoho\crm\api\util\Choice($line['Moyen_de_paiement']));
+
+            // TODO : manage product items list
+
+            $recordOperations->upsertRecords(
+                'Sales_Orders',
+                $body,
+            );
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
 }

@@ -51,36 +51,34 @@ final class ContactLoader implements LoaderInterface
 
         $line = yield;
         do {
-            $body = new \com\zoho\crm\api\record\BodyWrapper();
-            $body->setData(
-                [
-                    [
-                        'ID_Contact' => $line['ID_Contact'],
-                        'Salutation' => $line['Salutation'],
-                        'First_Name' => $line['First_Name'],
-                        'Last_Name' => $line['Last_Name'],
-                        'Email' => $line['Email'],
-                        'Phone' => $line['Phone'],
-                        'Date_of_Birth' => $line['Date_of_Birth'],
-                        'Mailing_Street' => $line['Mailing_Street'],
-                        'Mailing_Zip' => $line['Mailing_Zip'],
-                        'Mailing_State' => $line['Mailing_State'],
-                        'Mailing_Country' => $line['Mailing_Country'],
-                        'Other_Street' => $line['Other_Street'],
-                        'Lead_Source' => $line['Lead_Source'],
-                        'Sous_origine' => $line['Sous_origine'],
-                        'Client_depuis' => $line['Client_depuis'],
-                        'Langue' => $line['Langue'],
-                        'Compte_bloqu' => $line['Compte_bloqu'],
-                    ]
-                ]
-            );
+            $recordOperations = new \com\zoho\crm\api\record\RecordOperations();
 
-            (new \com\zoho\crm\api\record\RecordOperations())
-                ->upsertRecords(
-                    'Contacts',
-                    $body,
-                );
+            $body = new \com\zoho\crm\api\record\BodyWrapper();
+
+            $record = new \com\zoho\crm\api\record\Record();
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::LastName(), $line['Last_Name']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::FirstName(), $line['First_Name']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Salutation(), new \com\zoho\crm\api\util\Choice($line['Salutation']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Email(), $line['Email']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Phone(), $line['Phone']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::DateOfBirth(), new \DateTime($line['Date_of_Birth']));
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingStreet(), $line['Mailing_Street']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingZip(), $line['Mailing_Zip']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingState(), $line['Mailing_State']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingCountry(), $line['Mailing_Country']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::LeadSource(), new \com\zoho\crm\api\util\Choice($line['Lead_Source']));
+            $record->addKeyValue('ID_Contact', $line['ID_Contact']);
+            $record->addKeyValue('Sous_origine', new \com\zoho\crm\api\util\Choice($line['Sous_origine']));
+            $record->addKeyValue('Client_depuis', new \DateTime($line['Client_depuis']));
+            $record->addKeyValue('Langue', new \com\zoho\crm\api\util\Choice($line['Langue']));
+            $record->addKeyValue('Compte_bloqu', new \com\zoho\crm\api\util\Choice($line['Compte_bloqu']));
+
+            $body->setData([$record]);
+
+            $recordOperations->upsertRecords(
+                'Contacts',
+                $body,
+            );
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
 }

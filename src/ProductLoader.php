@@ -51,33 +51,39 @@ final class ProductLoader implements LoaderInterface
 
         $line = yield;
         do {
+            $recordOperations = new \com\zoho\crm\api\record\RecordOperations();
+
             $body = new \com\zoho\crm\api\record\BodyWrapper();
+
+            $record = new \com\zoho\crm\api\record\Record();
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::ProductName(), $line['Product_Name']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::ProductCode(), $line['Product_Code']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::ProductActive(), (bool) $line['Product_Active']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::UnitPrice(), (float) $line['Unit_Price']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::ProductCategory(), new \com\zoho\crm\api\util\Choice($line['Product_Category']));
+            $record->addKeyValue('Famille_de_Produit', new \com\zoho\crm\api\util\Choice($line['Famille_de_Produit']));
+            $record->addKeyValue('Collection', new \com\zoho\crm\api\util\Choice($line['Collection']));
+
+            $taxes = [];
+            foreach ($line['Taxes'] as $tax) {
+                $taxRecord = new \com\zoho\crm\api\record\Tax();
+                $taxRecord->setValue($tax['Tax']);
+
+                $taxes[] = $tax;
+            }
+
+            $record->addFieldValue(\com\zoho\crm\api\record\Products::Tax(), $taxes);
 
             $body->setData(
                 [
-                   [
-                       'Product_Code' => $line['Product_Code'],
-                       'Product_Name' => $line['Product_Name'],
-                       'Product_Active' => $line['Product_Active'],
-                       'Sales_Start_Date' => $line['Sales_Start_Date'],
-                       'Sales_End_Date' => $line['Sales_End_Date'],
-                       'Unit_Price' => $line['Product_Code'],
-                       'Tax' => $line['Tax'],
-                       'Description' => $line['Description'],
-                       'Product_Category' => $line['Product_Category'],
-                       'Famille_de_Produit' => $line['Famille_de_Produit'],
-                       'Collection' => $line['Collection'],
-                       'Type_de_produit' => $line['Type de produit'],
-                       'URL_Produit_eshop' => $line['URL_Produit_eshop'],
-                   ],
+                    $record
                 ]
             );
 
-            (new \com\zoho\crm\api\record\RecordOperations())
-                ->upsertRecords(
-                    'Products',
-                    $body,
-                );
+            $recordOperations->upsertRecords(
+                'Products',
+                $body,
+            );
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
 }
