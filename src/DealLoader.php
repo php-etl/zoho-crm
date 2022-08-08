@@ -55,9 +55,14 @@ final class DealLoader implements LoaderInterface
 
             $body = new \com\zoho\crm\api\record\BodyWrapper();
 
-            $contact = $recordOperations->getRecord('468784000000394792', 'Contacts')->getObject()->getData()[0];
-            $order = $recordOperations->getRecord('468784000000410925', 'Sales_Orders')->getObject()->getData()[0];
-            $product = $recordOperations->getRecord('468784000000380141', 'Products')->getObject()->getData()[0];
+            $contact = new \com\zoho\crm\api\record\Record();
+            $contact->addKeyValue('id', $line['Contact_ID']);
+
+            $order = new \com\zoho\crm\api\record\Record();
+            $order->addKeyValue('id', $line['Order_ID']);
+
+            $product = new \com\zoho\crm\api\record\Record();
+            $product->addKeyValue('id', $line['Product_ID']);
 
             $record = new \com\zoho\crm\api\record\Record();
             $record->addFieldValue(\com\zoho\crm\api\record\Deals::Amount(), (float) $line['Amount']);

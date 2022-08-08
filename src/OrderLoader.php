@@ -55,7 +55,8 @@ final class OrderLoader implements LoaderInterface
 
             $body = new \com\zoho\crm\api\record\BodyWrapper();
 
-            $contact = $recordOperations->getRecord($line['Contact_Name'], 'Contacts')->getObject()->getData()[0];
+            $contact = new \com\zoho\crm\api\record\Record();
+            $contact->addKeyValue('id', $line['Contact_ID']);
 
             $record = new \com\zoho\crm\api\record\Record();
             $record->addFieldValue(\com\zoho\crm\api\record\Sales_Orders::Subject(), $line['Subject']);
