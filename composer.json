@@ -1,5 +1,5 @@
 {
-    "name": "php-etl/zoho-crm",
+    "name": "php-etl/zoho-crm-loaders",
     "autoload": {
         "psr-4": {
             "Kiboko\\ZohoCRM\\": "src/"
