@@ -2,12 +2,12 @@
     "name": "php-etl/zoho-crm-loaders",
     "autoload": {
         "psr-4": {
-            "Kiboko\\ZohoCRM\\": "src/"
+            "Kiboko\\ZohoCRM\\Loader\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Kiboko\\ZohoCRM\\Tests\\": "tests/"
+            "Tests\\Kiboko\\ZohoCRM\\Loader\\": "tests/"
         }
     },
     "authors": [
@@ -29,5 +29,12 @@
         "branch-alias": {
             "dev-main": "0.1.x-dev"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "php-etl/phpunit-extension": "^0.4.0"
+    },
+    "config": {
+        "bin-dir": "bin"
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kiboko\ZohoCRM;
+namespace Kiboko\ZohoCRM\Loader;
 
 use com\zoho\api\logger\Levels;
 use com\zoho\api\logger\LogBuilder;
@@ -46,7 +46,8 @@ final class ContactLoader implements LoaderInterface
                 ->logger($logger)
                 ->initialize();
         } catch (\com\zoho\crm\api\exception\SDKException $exception) {
-            $this->logger->alert($exception->getMessage());
+            $this->logger->alert($exception->getMessage(), ['exception' => $exception]);
+            return;
         }
 
         $line = yield;
@@ -75,10 +76,15 @@ final class ContactLoader implements LoaderInterface
 
             $body->setData([$record]);
 
-            $recordOperations->upsertRecords(
-                'Contacts',
-                $body,
-            );
+            try {
+                $recordOperations->upsertRecords(
+                    'Contacts',
+                    $body,
+                );
+            } catch (\com\zoho\crm\api\exception\SDKException $exception) {
+                $this->logger->alert($exception->getMessage(), ['exception' => $exception]);
+                return;
+            }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
 }
