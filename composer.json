@@ -2,12 +2,12 @@
     "name": "php-etl/zoho-crm-flow",
     "autoload": {
         "psr-4": {
-            "Kiboko\\ZohoCRM\\Loader\\": "src/"
+            "Kiboko\\Component\\Flow\\ZohoCRM\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Kiboko\\ZohoCRM\\Loader\\": "tests/"
+            "Tests\\Kiboko\\Component\\Flow\\ZohoCRM\\": "tests/"
         }
     },
     "authors": [

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kiboko\ZohoCRM\Loader;
+namespace Kiboko\Component\Flow\ZohoCRM;
 
 use com\zoho\api\logger\Levels;
 use com\zoho\api\logger\LogBuilder;
@@ -59,20 +59,23 @@ final class ContactLoader implements LoaderInterface
             $record = new \com\zoho\crm\api\record\Record();
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::LastName(), $line['Last_Name']);
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::FirstName(), $line['First_Name']);
-            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Salutation(), new \com\zoho\crm\api\util\Choice($line['Salutation']));
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Email(), $line['Email']);
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::Phone(), $line['Phone']);
-            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::DateOfBirth(), new \DateTime($line['Date_of_Birth']));
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingStreet(), $line['Mailing_Street']);
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingZip(), $line['Mailing_Zip']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingCity(), $line['Mailing_City']);
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingState(), $line['Mailing_State']);
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::MailingCountry(), $line['Mailing_Country']);
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::OtherStreet(), $line['Other_Street'] ?? '');
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::OtherZip(), $line['Other_Zip'] ?? '');
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::OtherCity(), $line['Other_City'] ?? '');
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::OtherState(), $line['Other_State'] ?? '');
+            $record->addFieldValue(\com\zoho\crm\api\record\Contacts::OtherCountry(), $line['Other_Country'] ?? '');
             $record->addFieldValue(\com\zoho\crm\api\record\Contacts::LeadSource(), new \com\zoho\crm\api\util\Choice($line['Lead_Source']));
-            $record->addKeyValue('ID_Contact', $line['ID_Contact']);
+            $record->addKeyValue('ID_Contact', (int) $line['ID_Contact']);
             $record->addKeyValue('Sous_origine', new \com\zoho\crm\api\util\Choice($line['Sous_origine']));
             $record->addKeyValue('Client_depuis', new \DateTime($line['Client_depuis']));
             $record->addKeyValue('Langue', new \com\zoho\crm\api\util\Choice($line['Langue']));
-            $record->addKeyValue('Compte_bloqu', new \com\zoho\crm\api\util\Choice($line['Compte_bloqu']));
 
             $body->setData([$record]);
 

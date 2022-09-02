@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Kiboko\ZohoCRM\Loader;
+namespace Tests\Kiboko\Component\Flow\ZohoCRM;
 
+use Kiboko\Component\Flow\ZohoCRM\ContactLoader;
 use Kiboko\Component\PHPUnitExtension\Assert\LoaderAssertTrait;
 use Kiboko\Component\PHPUnitExtension\PipelineRunner;
 use Kiboko\Contract\Pipeline\PipelineRunnerInterface;
-use Kiboko\ZohoCRM\Loader\ContactLoader;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 

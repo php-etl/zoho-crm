@@ -83,6 +83,15 @@ final class OrderLoader implements LoaderInterface
             $record->addKeyValue('Moyen_de_paiement', new \com\zoho\crm\api\util\Choice($line['Moyen_de_paiement']));
 
             // TODO : manage product items list
+            foreach ($line['items'] as $item) {
+                $record->addKeyValue('Product_Name', $item['name']);
+//                $record->addKeyValue('Statut', $item['name']);
+                $record->addKeyValue('Quantity', $item['qty_ordered']);
+                $record->addKeyValue('Unit_Price', $item['price']);
+                $record->addKeyValue('List_Price', $item['price']);
+//                $record->addKeyValue('Tax', $item['tax_amount']);
+                $record->addKeyValue('Total', $item['row_total']);
+            }
 
             try {
                 $recordOperations->upsertRecords(

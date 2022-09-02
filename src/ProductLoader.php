@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kiboko\ZohoCRM\Loader;
+namespace Kiboko\Component\Flow\ZohoCRM;
 
 use com\zoho\api\logger\Levels;
 use com\zoho\api\logger\LogBuilder;
