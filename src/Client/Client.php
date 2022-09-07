@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM\Client;
 
-use GuzzleHttp\Psr7\Request;
+use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
-final class Client implements ClientInterface
+class Client implements ClientInterface
 {
-    private array $credentials;
-
     public function __construct(
-        private \Psr\Http\Client\ClientInterface $client,
-        private string $clientId,
-        private string $clientSecret,
-        private string $code,
+        private PsrClientInterface $client,
+        private RequestFactoryInterface $requestFactory,
+        private UriFactoryInterface $uriFactory,
+        private StreamFactoryInterface $streamFactory,
     ) {
-        $this->credentials = $this->generateToken($this->clientId, $this->clientSecret, $this->code);
     }
 
     /**
@@ -27,20 +28,15 @@ final class Client implements ClientInterface
     public function upsertContacts(array $body): void
     {
         $response = $this->client->sendRequest(
-            new Request(
-                method: 'POST',
-                uri: 'https://www.zohoapis.eu/crm/v3/Contacts/upsert',
-                headers: [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer ' . $this->credentials["access_token"],
-                ],
-                body: json_encode(['data' => [$body]], JSON_THROW_ON_ERROR),
+            $this->requestFactory->createRequest(
+                'POST',
+                $this->uriFactory->createUri('crm/v3/Contacts/upsert')
             )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(sprintf('Oops, something went wrong while creating Contacts : %s', $response->getReasonPhrase()));
-        }
+        $this->processResponse($response);
     }
 
     /**
@@ -50,20 +46,15 @@ final class Client implements ClientInterface
     public function upsertProducts(array $body): void
     {
         $response = $this->client->sendRequest(
-            new Request(
-                method: 'POST',
-                uri: 'https://www.zohoapis.eu/crm/v3/Products/upsert',
-                headers: [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer '. $this->credentials["access_token"],
-                ],
-                body: json_encode(['data' => [$body]], JSON_THROW_ON_ERROR),
+            $this->requestFactory->createRequest(
+                'POST',
+                $this->uriFactory->createUri('crm/v3/Products/upsert')
             )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(sprintf('Oops, something went wrong while creating Products : %s', $response->getReasonPhrase()));
-        }
+        $this->processResponse($response);
     }
 
     /**
@@ -73,52 +64,37 @@ final class Client implements ClientInterface
     public function upsertOrders(array $body): void
     {
         $response = $this->client->sendRequest(
-            new Request(
-                method: 'POST',
-                uri: 'https://www.zohoapis.eu/crm/v3/Sales_Orders/upsert',
-                headers: [
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer' . $this->credentials["access_token"],
-                ],
-                body: json_encode(['data' => [$body]], JSON_THROW_ON_ERROR),
+            $this->requestFactory->createRequest(
+                'POST',
+                $this->uriFactory->createUri('crm/v3/Sales_Orders/upsert')
             )
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
 
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(sprintf('Oops, something went wrong while creating Orders : %s', $response->getReasonPhrase()));
-        }
+        $this->processResponse($response);
     }
 
-    public function generateToken(string $clientId, string $clientSecret, string $code): array
+    private function processResponse(ResponseInterface $response): void
     {
-        $response = $this->client->sendRequest(
-            new Request(
-                method: 'POST',
-                uri: 'https://accounts.zoho.eu/oauth/v2/token?client_id=' . $clientId . '&client_secret=' . $clientSecret . '&code=' . $code . '&grant_type=authorization_code'
-            )
-        );
-
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(sprintf('Oops, something went wrong while generating credentials : %s', $response->getReasonPhrase()));
+        if ($response->getStatusCode() === 400) {
+            throw new BadRequestException('Please check the information sent.');
         }
 
-        return json_decode($response->getBody()->getContents(), true);
-    }
-
-    public function refreshToken(string $clientId, string $clientSecret): string
-    {
-        $response = $this->client->sendRequest(
-            new Request(
-                method: 'POST',
-                uri: 'https://www.zohoapis.eu/oauth/v2/token?client_id=' . $clientId . '&client_secret=' . $clientSecret . '&refresh_token=' . $this->credentials["refresh_token"] . '&grant_type=refresh_token',
-            )
-        );
-
-        if ($response->getStatusCode() !== 200) {
-            throw new \RuntimeException(sprintf('Oops, something went wrong while refreshing credentials : %s', $response->getReasonPhrase()));
+        if ($response->getStatusCode() === 403) {
+            throw new ForbiddenException('Please login before making your request.');
         }
 
-        $credentials = json_decode($response->getBody()->getContents(), true);
-        return $credentials["access_token"];
+        if ($response->getStatusCode() === 413) {
+            throw new RequestEntityTooLargeException('The maximum size limit of the request has been exceeded. Please check the data sent.');
+        }
+
+        if ($response->getStatusCode() === 429) {
+            throw new ApiRateExceededException('The request rate limit has been exceeded. Please try again later.');
+        }
+
+        if ($response->getStatusCode() === 500) {
+            throw new InternalServerErrorException('The server encountered an unexpected error. Please try again later');
+        }
     }
 }
