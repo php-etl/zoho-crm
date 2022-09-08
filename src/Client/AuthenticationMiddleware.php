@@ -110,6 +110,5 @@ class AuthenticationMiddleware implements ClientInterface
         }
 
         $this->accessToken = $credentials["access_token"];
-        $this->refreshToken = $credentials["refresh_token"];
     }
 }
