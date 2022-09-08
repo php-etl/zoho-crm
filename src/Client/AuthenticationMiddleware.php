@@ -44,7 +44,7 @@ class AuthenticationMiddleware implements ClientInterface
 
     private function tryRequest(RequestInterface $request): ResponseInterface
     {
-        $request->withAddedHeader('Authorization', sprintf('Zoho-oauthtoken %s', $this->accessToken));
+        $request = $request->withHeader('Authorization', sprintf('Bearer %s', $this->accessToken));
 
         return $this->decorated->sendRequest($request);
     }

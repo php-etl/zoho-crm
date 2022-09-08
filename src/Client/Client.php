@@ -88,11 +88,11 @@ class Client implements ClientInterface
     private function processResponse(ResponseInterface $response): void
     {
         if ($response->getStatusCode() === 400) {
-            throw new BadRequestException('Please check the information sent.');
+            throw new BadRequestException('The format of the request is not correct. Please check the information sent.');
         }
 
         if ($response->getStatusCode() === 403) {
-            throw new ForbiddenException('Please login before making your request.');
+            throw new ForbiddenException('You do not have the right to make this request. Please login before making your request or verify your rights.');
         }
 
         if ($response->getStatusCode() === 413) {
