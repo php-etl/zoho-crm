@@ -53,7 +53,7 @@ class Client implements ClientInterface
             $this->requestFactory->createRequest(
                 'POST',
                 $this->uriFactory->createUri()
-                    ->withPath('crm/v3/Products/upsert')
+                    ->withPath('/crm/v3/Products/upsert')
                     ->withHost($this->host)
                     ->withScheme('https')
             )
@@ -74,7 +74,7 @@ class Client implements ClientInterface
             $this->requestFactory->createRequest(
                 'POST',
                 $this->uriFactory->createUri()
-                    ->withPath('crm/v3/Sales_Orders/upsert')
+                    ->withPath('/crm/v3/Sales_Orders/upsert')
                     ->withHost($this->host)
                     ->withScheme('https')
             )
