@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Kiboko\ZohoCRM\Loader;
+namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
 use Kiboko\Contract\Pipeline\LoaderInterface;
