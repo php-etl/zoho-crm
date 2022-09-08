@@ -14,6 +14,7 @@ use Psr\Http\Message\UriFactoryInterface;
 class Client implements ClientInterface
 {
     public function __construct(
+        private string $host,
         private PsrClientInterface $client,
         private RequestFactoryInterface $requestFactory,
         private UriFactoryInterface $uriFactory,
@@ -30,7 +31,10 @@ class Client implements ClientInterface
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
-                $this->uriFactory->createUri('crm/v3/Contacts/upsert')
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Contacts/upsert')
+                    ->withHost($this->host)
+                    ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
@@ -48,7 +52,10 @@ class Client implements ClientInterface
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
-                $this->uriFactory->createUri('crm/v3/Products/upsert')
+                $this->uriFactory->createUri()
+                    ->withPath('crm/v3/Products/upsert')
+                    ->withHost($this->host)
+                    ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
@@ -66,7 +73,10 @@ class Client implements ClientInterface
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
-                $this->uriFactory->createUri('crm/v3/Sales_Orders/upsert')
+                $this->uriFactory->createUri()
+                    ->withPath('crm/v3/Sales_Orders/upsert')
+                    ->withHost($this->host)
+                    ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))

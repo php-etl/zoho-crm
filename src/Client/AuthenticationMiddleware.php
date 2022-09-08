@@ -44,7 +44,7 @@ class AuthenticationMiddleware implements ClientInterface
 
     private function tryRequest(RequestInterface $request): ResponseInterface
     {
-        $request->withHeader('Authorization', sprintf('Bearer %s', $this->accessToken));
+        $request->withAddedHeader('Authorization', sprintf('Zoho-oauthtoken %s', $this->accessToken));
 
         return $this->decorated->sendRequest($request);
     }
@@ -54,7 +54,7 @@ class AuthenticationMiddleware implements ClientInterface
         $response = $this->decorated->sendRequest(
             request: $this->requestFactory->createRequest(
                 method: 'POST',
-                uri: $this->uriFactory->createUri('/oauth/v2/token')
+                uri: $this->uriFactory->createUri()
                     ->withQuery(http_build_query([
                         'client_id' => $this->clientId,
                         'client_secret' => $this->clientSecret,
@@ -63,6 +63,7 @@ class AuthenticationMiddleware implements ClientInterface
                     ]))
                     ->withPath('/oauth/v2/token')
                     ->withHost($this->oauthBaseUri)
+                    ->withScheme('https')
             )
         );
 
@@ -71,6 +72,11 @@ class AuthenticationMiddleware implements ClientInterface
         }
 
         $credentials = json_decode($response->getBody()->getContents(), true);
+
+        if (array_key_exists('error', $credentials)) {
+            throw new InvalidCodeException('Invalid grant token. Please check your information.');
+        }
+
         $this->accessToken = $credentials['access_token'];
         $this->refreshToken = $credentials['refresh_token'];
     }
@@ -89,6 +95,7 @@ class AuthenticationMiddleware implements ClientInterface
                     ]))
                     ->withPath('/oauth/v2/token')
                     ->withHost($this->oauthBaseUri)
+                    ->withScheme('https')
             )
         );
 
@@ -97,6 +104,11 @@ class AuthenticationMiddleware implements ClientInterface
         }
 
         $credentials = json_decode($response->getBody()->getContents(), true);
+
+        if (array_key_exists('error', $credentials)) {
+            throw new InvalidCodeException('Invalid grant token. Please check your information.');
+        }
+
         $this->accessToken = $credentials["access_token"];
         $this->refreshToken = $credentials["refresh_token"];
     }
