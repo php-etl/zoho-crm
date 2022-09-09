@@ -85,6 +85,56 @@ class Client implements ClientInterface
         $this->processResponse($response);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function searchProduct(string $code): array
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'GET',
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Products/search')
+                    ->withQuery(http_build_query([
+                        'criteria' => sprintf('Product_Code:equals:%s', $code)
+                    ]))
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+        );
+
+        $this->processResponse($response);
+
+        $result = json_decode($response->getBody()->getContents(), false);
+        return $result["data"][0];
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function searchContact(string $email): array
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'GET',
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Contacts/search')
+                    ->withQuery(http_build_query([
+                        'email' => $email
+                    ]))
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+        );
+
+        $this->processResponse($response);
+
+        $result = json_decode($response->getBody()->getContents(), false);
+        return $result["data"][0];
+    }
+
     private function processResponse(ResponseInterface $response): void
     {
         if ($response->getStatusCode() === 400) {
@@ -93,6 +143,10 @@ class Client implements ClientInterface
 
         if ($response->getStatusCode() === 403) {
             throw new ForbiddenException('You do not have the right to make this request. Please login before making your request or verify your rights.');
+        }
+
+        if ($response->getStatusCode() === 404) {
+            throw new NotFoundException('What you are looking for does not exist. Please check your request.');
         }
 
         if ($response->getStatusCode() === 413) {
