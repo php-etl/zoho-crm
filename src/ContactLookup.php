@@ -21,22 +21,20 @@ final class ContactLookup implements TransformerInterface
             $bucket = new ComplexResultBucket();
             $output = $line;
 
-            (function ($input, $bucket) use ($output) {
-                try {
-                    $lookup = $this->client->searchContact(email: $input['E_mail_de_la_commande']);
-                } catch (\RuntimeException $exception) {
-                    $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $input]);
-                    $bucket->reject($input);
-                    return;
-                }
+            try {
+                $lookup = $this->client->searchContact(email: $line['E_mail_de_la_commande']);
+            } catch (\RuntimeException $exception) {
+                $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+                $bucket->reject($line);
+                return;
+            }
 
-                $output = (function () use ($lookup, $output) {
-                    $output['Contact_Name'] = $lookup['id'];
-                    return $output;
-                })();
+            $output = (function () use ($lookup, $output) {
+                $output['Contact_Name'] = $lookup['id'];
+                return $output;
+            })();
 
-                $bucket->accept($output);
-            })($line, $bucket);
+            $bucket->accept($output);
         } while ($line = (yield $bucket));
     }
 }
