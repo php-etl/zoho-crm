@@ -97,7 +97,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Products')
                     ->withQuery(http_build_query([
-                        'fields' => ['id', 'Product_Code']
+                        'fields' => implode(',', ['id', 'Product_Code'])
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -122,7 +122,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Contacts')
                     ->withQuery(http_build_query([
-                        'fields' => ['id', 'Email']
+                        'fields' => implode(',', ['id', 'Email'])
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
