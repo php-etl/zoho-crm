@@ -89,15 +89,15 @@ class Client implements ClientInterface
      * @throws ClientExceptionInterface
      * @throws \JsonException
      */
-    public function getProducts(): array
+    public function searchProduct(string $code): array
     {
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'GET',
                 $this->uriFactory->createUri()
-                    ->withPath('/crm/v3/Products')
+                    ->withPath('/crm/v3/Products/search')
                     ->withQuery(http_build_query([
-                        'fields' => implode(',', ['id', 'Product_Code'])
+                        'criteria' => sprintf('Product_Code:equals:%s', $code)
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -106,23 +106,27 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The product with SKU %s does not exists.', $code));
+        }
+
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"];
+        return $result["data"][0];
     }
 
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
      */
-    public function getContacts(): array
+    public function searchContact(string $email): array
     {
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'GET',
                 $this->uriFactory->createUri()
-                    ->withPath('/crm/v3/Contacts')
+                    ->withPath('/crm/v3/Contacts/search')
                     ->withQuery(http_build_query([
-                        'fields' => implode(',', ['id', 'Email'])
+                        'email' => $email
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -131,8 +135,12 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The contact with email %s does not exists.', $email));
+        }
+
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"];
+        return $result["data"][0];
     }
 
     private function processResponse(ResponseInterface $response): void
