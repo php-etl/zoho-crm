@@ -106,6 +106,10 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The product with SKU %s does not exists.', $code));
+        }
+
         $result = json_decode($response->getBody()->getContents(), false);
         return $result["data"][0];
     }
@@ -130,6 +134,10 @@ class Client implements ClientInterface
         );
 
         $this->processResponse($response);
+
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The contact with email %s does not exists.', $email));
+        }
 
         $result = json_decode($response->getBody()->getContents(), false);
         return $result["data"][0];
