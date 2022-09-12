@@ -7,7 +7,6 @@ namespace Kiboko\Component\Flow\ZohoCRM;
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
 use Kiboko\Contract\Pipeline\ExtractorInterface;
-use Psr\Http\Client\ClientExceptionInterface;
 
 final class ProductExtractor implements ExtractorInterface
 {
@@ -20,9 +19,7 @@ final class ProductExtractor implements ExtractorInterface
         try {
             yield new AcceptanceResultBucket(...$this->client->getProducts());
         } catch (\RuntimeException $exception) {
-            $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $item]);
-        } catch (\JsonException $e) {
-        } catch (ClientExceptionInterface $e) {
+            $this->logger->warning($exception->getMessage(), ['exception' => $exception]);
         }
     }
 }
