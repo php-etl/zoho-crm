@@ -18,7 +18,7 @@ final class ContactLookup implements TransformerInterface
         private readonly \Psr\Log\LoggerInterface $logger,
         private CacheInterface $cache,
         private CompiledMapperInterface $mapper,
-        private string $mappingField
+        private string $mappingField,
     ) {
     }
 

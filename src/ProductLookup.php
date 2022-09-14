@@ -18,7 +18,9 @@ final class ProductLookup implements TransformerInterface
         private Client $client,
         private readonly \Psr\Log\LoggerInterface $logger,
         private CacheInterface $cache,
-        private string $mappingField
+        private CompiledMapperInterface $mapper,
+        private string $mappingField,
+        private string $orderItemsField,
     ) {
     }
 
@@ -28,12 +30,12 @@ final class ProductLookup implements TransformerInterface
         while (true) {
             $output = $line;
 
-            foreach ($line["Ordered_Items"] as $key => $item) {
+            foreach ($line[$this->orderItemsField] as $key => $item) {
                 try {
                     $lookup = $this->cache->get(sprintf('product.%s', $item[$this->mappingField]));
 
                     if ($lookup === null) {
-                        $lookup = $this->client->searchProduct(code: $item['Code_Produit']);
+                        $lookup = $this->client->searchProduct(code: $item[$this->mappingField]);
 
                         $this->cache->set(sprintf('product.%s', $line[$this->mappingField]), $lookup);
                     }
@@ -43,7 +45,7 @@ final class ProductLookup implements TransformerInterface
                     continue;
                 }
 
-                $output['Ordered_Items'][$key]['Product_Name'] = $lookup['id'];
+                $output = ($this->mapper)($lookup, $line[$this->orderItemsField][$key]);
             }
 
             $line = yield new AcceptanceResultBucket($output);
