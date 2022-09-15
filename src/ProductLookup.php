@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
-use Kiboko\Component\Bucket\ComplexResultBucket;
 use Kiboko\Component\Bucket\RejectionResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
-use Kiboko\Contract\Mapping\CompiledMapperInterface;
+use Kiboko\Contract\Mapping\ArrayMapperInterface;
 use Kiboko\Contract\Pipeline\TransformerInterface;
 use Psr\SimpleCache\CacheInterface;
 
@@ -18,7 +17,7 @@ final class ProductLookup implements TransformerInterface
         private Client $client,
         private readonly \Psr\Log\LoggerInterface $logger,
         private CacheInterface $cache,
-        private CompiledMapperInterface $mapper,
+        private ArrayMapperInterface $mapper,
         private string $mappingField,
         private string $orderItemsField,
     ) {
@@ -45,7 +44,13 @@ final class ProductLookup implements TransformerInterface
                     continue;
                 }
 
-                $output[$this->orderItemsField][$key]['Product_Name'] = $lookup['id'];
+                $output = ($this->mapper)(
+                    $lookup,
+                    $output,
+                    new \Symfony\Component\PropertyAccess\PropertyPath(
+                        sprintf('[Ordered_Items][%d][Product_Name]', $key)
+                    )
+                );
             }
 
 
