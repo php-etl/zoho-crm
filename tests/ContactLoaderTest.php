@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Kiboko\Component\Flow\ZohoCRM;
 
+use GuzzleHttp\Psr7\HttpFactory;
+use Kiboko\Component\Flow\ZohoCRM\Client\AuthenticationMiddleware;
+use Kiboko\Component\Flow\ZohoCRM\Client\Client;
 use Kiboko\Component\Flow\ZohoCRM\ContactLoader;
 use Kiboko\Component\PHPUnitExtension\Assert\LoaderAssertTrait;
 use Kiboko\Component\PHPUnitExtension\PipelineRunner;
@@ -17,7 +20,25 @@ final class ContactLoaderTest extends TestCase
 
     public function testIsSuccessful(): void
     {
-        $loader = new ContactLoader(new NullLogger());
+        $httpFactory = new HttpFactory();
+
+        $loader = new ContactLoader(
+            new Client(
+                new AuthenticationMiddleware(
+                    new \Http\Mock\Client(),
+                    $httpFactory,
+                    $httpFactory,
+                    'https://example.com',
+                    '1234567890',
+                    '12345678909876432',
+                    '1234567890987654321234567890°',
+                ),
+                $httpFactory,
+                $httpFactory,
+                $httpFactory,
+            ),
+            new NullLogger(),
+        );
 
         $data = [
             [
