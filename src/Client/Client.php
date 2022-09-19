@@ -143,6 +143,35 @@ class Client implements ClientInterface
         return $result["data"][0];
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function searchOrder(string $subject): array
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'GET',
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Sales_Orders/search')
+                    ->withQuery(http_build_query([
+                        'criteria' => sprintf('Subject:equals:%s', $subject)
+                    ]))
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+        );
+
+        $this->processResponse($response);
+
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The order with subject %s does not exists.', $subject));
+        }
+
+        $result = json_decode($response->getBody()->getContents(), true);
+        return $result["data"][0];
+    }
+
     private function processResponse(ResponseInterface $response): void
     {
         if ($response->getStatusCode() === 400) {
