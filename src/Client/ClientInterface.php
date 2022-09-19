@@ -7,6 +7,7 @@ namespace Kiboko\Component\Flow\ZohoCRM\Client;
 interface ClientInterface
 {
     public function upsertContacts(array $body): void;
-    public function upsertProducts(array $body): void;
+    public function insertProduct(array $body): void;
+    public function updateProduct(int $code, array $body): void;
     public function upsertOrders(array $body): void;
 }

@@ -47,7 +47,7 @@ class Client implements ClientInterface
      * @throws ClientExceptionInterface
      * @throws \JsonException
      */
-    public function upsertProducts(array $body): void
+    public function insertProduct(array $body): void
     {
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
@@ -60,6 +60,11 @@ class Client implements ClientInterface
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
+
+        if ($response->getCode() === 400) {
+            $result = json_decode($response->getMessage());
+
+        }
 
         $this->processResponse($response);
     }
@@ -174,10 +179,6 @@ class Client implements ClientInterface
 
     private function processResponse(ResponseInterface $response): void
     {
-        if ($response->getStatusCode() === 400) {
-            throw new BadRequestException('The format of the request is not correct. Please check the information sent.');
-        }
-
         if ($response->getStatusCode() === 403) {
             throw new ForbiddenException('You do not have the right to make this request. Please login before making your request or verify your rights.');
         }
@@ -210,6 +211,23 @@ class Client implements ClientInterface
                 'POST',
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Deals/upsert')
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
+        );
+
+        $this->processResponse($response);
+    }
+
+    public function updateProduct(int $code, array $body): void
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'POST',
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Product/update')
                     ->withHost($this->host)
                     ->withScheme('https')
             )

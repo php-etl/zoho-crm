@@ -21,7 +21,7 @@ final class ProductLoader implements LoaderInterface
         $line = yield;
         do {
             try {
-                $this->client->upsertProducts($line);
+                $this->client->insertProduct($line);
             } catch (\RuntimeException $exception) {
                 $this->logger->alert($exception->getMessage(), ['exception' => $exception]);
             }
