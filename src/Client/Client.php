@@ -198,4 +198,25 @@ class Client implements ClientInterface
             throw new InternalServerErrorException('The server encountered an unexpected error. Please try again later');
         }
     }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function upsertDeals(array $body): void
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'POST',
+                $this->uriFactory->createUri()
+                    ->withPath('/crm/v3/Deals/upsert')
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+                ->withHeader('Content-Type', 'application/json')
+                ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
+        );
+
+        $this->processResponse($response);
+    }
 }

@@ -20,6 +20,7 @@ final class ProductLookup implements TransformerInterface
         private ArrayMapperInterface $mapper,
         private string $mappingField,
         private string $orderItemsField,
+        private string $propertyPath,
     ) {
     }
 
@@ -48,7 +49,7 @@ final class ProductLookup implements TransformerInterface
                     $lookup,
                     $output,
                     new \Symfony\Component\PropertyAccess\PropertyPath(
-                        sprintf('[Ordered_Items][%d][Product_Name]', $key)
+                        sprintf($this->propertyPath, $key)
                     )
                 );
             }
