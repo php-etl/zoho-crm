@@ -58,7 +58,9 @@ class Client implements ClientInterface
                     ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
+            ->withBody($this->streamFactory->createStream(
+                json_encode(['data' => [$body], 'duplicate_check_fields' => ['Product_Code']], JSON_THROW_ON_ERROR))
+            )
         );
 
         $this->processResponse($response);
