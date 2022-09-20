@@ -53,18 +53,13 @@ class Client implements ClientInterface
             $this->requestFactory->createRequest(
                 'POST',
                 $this->uriFactory->createUri()
-                    ->withPath('/crm/v3/Products/upsert')
+                    ->withPath('/crm/v3/Products')
                     ->withHost($this->host)
                     ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
             ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
-
-        if ($response->getCode() === 400) {
-            $result = json_decode($response->getMessage());
-
-        }
 
         $this->processResponse($response);
     }
@@ -179,6 +174,13 @@ class Client implements ClientInterface
 
     private function processResponse(ResponseInterface $response): void
     {
+        if ($response->getStatusCode() === 400) {
+            throw new BadRequestException(
+                'The format of the request is not correct. Please check the information sent.',
+                $response,
+            );
+        }
+
         if ($response->getStatusCode() === 403) {
             throw new ForbiddenException('You do not have the right to make this request. Please login before making your request or verify your rights.');
         }
@@ -221,13 +223,13 @@ class Client implements ClientInterface
         $this->processResponse($response);
     }
 
-    public function updateProduct(int $code, array $body): void
+    public function updateProduct(string $code, array $body): void
     {
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
-                'POST',
+                'PUT',
                 $this->uriFactory->createUri()
-                    ->withPath('/crm/v3/Product/update')
+                    ->withPath(sprintf('/crm/v3/Product/%s', $code))
                     ->withHost($this->host)
                     ->withScheme('https')
             )
