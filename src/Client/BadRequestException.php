@@ -15,6 +15,6 @@ final class BadRequestException extends \RuntimeException
 
     public function getResponse(): ResponseInterface
     {
-       return $this->response;
+        return $this->response;
     }
 }
