@@ -26,8 +26,12 @@ final class ProductLoader implements LoaderInterface
             } catch (BadRequestException $exception) {
                 $result = json_decode($exception->getResponse()->getBody()->getContents(), true);
 
-                if ($result['data']['code'] === 'duplicate_data') {
-                    $this->client->updateProduct($result['data']['details']['duplicate_record']['id'], $line);
+                if ($result['data'][0]['code'] === 'DUPLICATE_DATA') {
+                    try {
+                        $this->client->updateProduct($result['data'][0]['details']['duplicate_record']['id'], $line);
+                    } catch (\RuntimeException $exception) {
+                        $this->logger->alert($exception->getMessage(), ['exception' => $exception]);
+                    }
                 } else {
                     $this->logger->alert($exception->getMessage(), ['exception' => $exception]);
                 }
