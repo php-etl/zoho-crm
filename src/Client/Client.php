@@ -229,7 +229,7 @@ class Client implements ClientInterface
             $this->requestFactory->createRequest(
                 'PUT',
                 $this->uriFactory->createUri()
-                    ->withPath(sprintf('/crm/v3/Product/%s', $code))
+                    ->withPath(sprintf('/crm/v3/Products/%s', $code))
                     ->withHost($this->host)
                     ->withScheme('https')
             )
