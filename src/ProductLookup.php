@@ -54,7 +54,6 @@ final class ProductLookup implements TransformerInterface
                 );
             }
 
-
             $line = yield new AcceptanceResultBucket($output);
         }
     }
