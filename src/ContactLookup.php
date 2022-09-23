@@ -33,7 +33,7 @@ final class ContactLookup implements TransformerInterface
                 if ($lookup === null) {
                     $lookup = $this->client->searchContact(email: $line[$this->mappingField]);
 
-                    $this->cache->set($encodedEmail, $lookup["id"]);
+                    $this->cache->set($encodedEmail, $lookup);
                 }
             } catch (\RuntimeException $exception) {
                 $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);

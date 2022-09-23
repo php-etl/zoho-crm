@@ -37,7 +37,7 @@ final class ProductLookup implements TransformerInterface
                     if ($lookup === null) {
                         $lookup = $this->client->searchProduct(code: $item[$this->mappingField]);
 
-                        $this->cache->set(sprintf('product.%s', $item[$this->mappingField]), $lookup['id']);
+                        $this->cache->set(sprintf('product.%s', $item[$this->mappingField]), $lookup);
                     }
                 } catch (\RuntimeException $exception) {
                     $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $item]);

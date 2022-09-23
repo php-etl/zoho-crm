@@ -32,7 +32,7 @@ final class OrderLookup implements TransformerInterface
                 if ($lookup === null) {
                     $lookup = $this->client->searchOrder(subject: $line[$this->mappingField]);
 
-                    $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup["id"]);
+                    $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
                 }
             } catch (\RuntimeException $exception) {
                 $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
