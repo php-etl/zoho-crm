@@ -25,7 +25,8 @@ final class OrderLookup implements TransformerInterface
         private readonly \Psr\Log\LoggerInterface $logger,
         private CacheInterface $cache,
         private CompiledMapperInterface $mapper,
-        private string $mappingField,
+        private string $subjectMappingField,
+        private string $storeMappingField,
     ) {
     }
 
@@ -34,12 +35,12 @@ final class OrderLookup implements TransformerInterface
         $line = yield;
         while (true) {
             try {
-                $lookup = $this->cache->get(sprintf('order.%s', $line[$this->mappingField]));
+                $lookup = $this->cache->get(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
 
                 if ($lookup === null) {
-                    $lookup = $this->client->searchOrder(subject: $line[$this->mappingField]);
+                    $lookup = $this->client->searchOrder(subject: $line[$this->subjectMappingField], store: $line[$this->storeMappingField]);
 
-                    $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
+                    $this->cache->set(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]), $lookup);
                 }
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
