@@ -26,14 +26,14 @@ final class GetOrderLookup implements TransformerInterface
     {
         $line = yield;
         while (true) {
-            if (array_key_exists('id', $line)) {
+            if (array_key_exists($this->mappingField, $line)) {
                 try {
-                    $lookup = $this->cache->get(sprintf('order.%s', $line['id']));
+                    $lookup = $this->cache->get(sprintf('order.%s', $line[$this->mappingField]));
 
                     if ($lookup === null) {
-                        $lookup = $this->client->getOrder(id: $line['id']);
+                        $lookup = $this->client->getOrder(id: $line[$this->mappingField]);
 
-                        $this->cache->set(sprintf('order.%s', $line['id']), $lookup);
+                        $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
                     }
                 } catch (\RuntimeException $exception) {
                     $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
