@@ -36,12 +36,13 @@ final class GetOrderLookup implements TransformerInterface
         $line = yield;
         while (true) {
             try {
-                $lookup = $this->cache->get(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
+                $encodingKey = base64_encode(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
+                $lookup = $this->cache->get($encodingKey);
 
                 if ($lookup === null) {
                     $lookup = $this->client->searchOrder(subject: $line[$this->subjectMappingField], store: $line[$this->storeMappingField]);
 
-                    $this->cache->set(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]), $lookup);
+                    $this->cache->set($encodingKey, $lookup);
                 }
 
                 $result = $lookup;
