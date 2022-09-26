@@ -7,6 +7,7 @@ namespace Kiboko\Component\Flow\ZohoCRM;
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
 use Kiboko\Component\Bucket\RejectionResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
+use Kiboko\Component\Flow\ZohoCRM\Client\NoContentException;
 use Kiboko\Contract\Mapping\CompiledMapperInterface;
 use Kiboko\Contract\Pipeline\TransformerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -26,26 +27,25 @@ final class GetOrderLookup implements TransformerInterface
     {
         $line = yield;
         while (true) {
-            if (array_key_exists($this->mappingField, $line)) {
-                try {
-                    $lookup = $this->cache->get(sprintf('order.%s', $line[$this->mappingField]));
+            try {
+                $lookup = $this->cache->get(sprintf('order.%s', $line[$this->mappingField]));
 
-                    if ($lookup === null) {
-                        $lookup = $this->client->getOrder(id: $line[$this->mappingField]);
+                if ($lookup === null) {
+                    $lookup = $this->client->searchOrder(subject: $line[$this->mappingField]);
 
-                        $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
-                    }
-                } catch (\RuntimeException $exception) {
-                    $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                    $line = yield new RejectionResultBucket($line);
-                    continue;
+                    $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
                 }
 
+                $lookup = $this->client->getOrder(id: $lookup['id']);
                 $output = ($this->mapper)($lookup, $line);
 
                 $line = yield new AcceptanceResultBucket($output);
-            } else {
+            } catch (NoContentException $exception) {
                 $line = yield new AcceptanceResultBucket($line);
+            } catch (\RuntimeException $exception) {
+                $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+                $line = yield new RejectionResultBucket($line);
+                continue;
             }
         }
     }
