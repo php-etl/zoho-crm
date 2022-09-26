@@ -81,7 +81,7 @@ class Client implements ClientInterface
                     ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body], '$append_values' => ['Ordered_Items' => false]], JSON_THROW_ON_ERROR)))
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
         );
 
         $this->processResponse($response);
@@ -220,5 +220,32 @@ class Client implements ClientInterface
         );
 
         $this->processResponse($response);
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function getOrder(string $id): array
+    {
+        $response = $this->client->sendRequest(
+            $this->requestFactory->createRequest(
+                'GET',
+                $this->uriFactory->createUri()
+                    ->withPath(sprintf('/crm/v3/Sales_Orders/%s', $id))
+                    ->withHost($this->host)
+                    ->withScheme('https')
+            )
+                ->withHeader('Content-Type', 'application/json')
+        );
+
+        $this->processResponse($response);
+
+        if ($response->getStatusCode() === 204) {
+            throw new NoContentException(sprintf('The order with id %s does not exists.', $id));
+        }
+
+        $result = json_decode($response->getBody()->getContents(), true);
+        return $result["data"][0];
     }
 }
