@@ -6,8 +6,15 @@ namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
 use Kiboko\Component\Bucket\RejectionResultBucket;
+use Kiboko\Component\Flow\ZohoCRM\Client\AccessDeniedException;
+use Kiboko\Component\Flow\ZohoCRM\Client\ApiRateExceededException;
+use Kiboko\Component\Flow\ZohoCRM\Client\BadRequestException;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
+use Kiboko\Component\Flow\ZohoCRM\Client\ForbiddenException;
+use Kiboko\Component\Flow\ZohoCRM\Client\InternalServerErrorException;
 use Kiboko\Component\Flow\ZohoCRM\Client\NoContentException;
+use Kiboko\Component\Flow\ZohoCRM\Client\NotFoundException;
+use Kiboko\Component\Flow\ZohoCRM\Client\RequestEntityTooLargeException;
 use Kiboko\Contract\Mapping\CompiledMapperInterface;
 use Kiboko\Contract\Pipeline\TransformerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -36,14 +43,25 @@ final class GetOrderLookup implements TransformerInterface
                     $this->cache->set(sprintf('order.%s', $line[$this->mappingField]), $lookup);
                 }
 
-                $lookup = $this->client->getOrder(id: $lookup['id']);
+                $result = $lookup;
+                $lookup = $this->cache->get(sprintf('order.%s', $result['id']));
+                if ($lookup === null) {
+                    $lookup = $this->client->getOrder(id: $result['id']);
+
+                    $this->cache->set(sprintf('order.%s', $result['id']), $lookup);
+                }
+
                 $output = ($this->mapper)($lookup, $line);
 
                 $line = yield new AcceptanceResultBucket($output);
             } catch (NoContentException $exception) {
                 $line = yield new AcceptanceResultBucket($line);
-            } catch (\RuntimeException $exception) {
-                $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+            } catch (InternalServerErrorException|ApiRateExceededException $exception) {
+                $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+                $line = yield new RejectionResultBucket($line);
+                return;
+            } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
+                $this->logger->error($exception->getMessage(), ['exception' => $exception]);
                 $line = yield new RejectionResultBucket($line);
                 continue;
             }
