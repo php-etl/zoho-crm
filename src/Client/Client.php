@@ -81,7 +81,7 @@ class Client implements ClientInterface
                     ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body], 'duplicate_check_fields' => ['Subject', 'Store']], JSON_THROW_ON_ERROR)))
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body], 'duplicate_check_fields' => ['Subject']], JSON_THROW_ON_ERROR)))
         );
 
         $this->processResponse($response);
@@ -177,7 +177,10 @@ class Client implements ClientInterface
     private function processResponse(ResponseInterface $response): void
     {
         if ($response->getStatusCode() === 400) {
-            throw new BadRequestException('The format of the request is not correct. Please check the information sent.');
+            throw new BadRequestException(
+                'The format of the request is not correct. Please check the information sent.',
+                $response,
+            );
         }
 
         if ($response->getStatusCode() === 403) {
