@@ -35,12 +35,13 @@ final class OrderLookup implements TransformerInterface
         $line = yield;
         while (true) {
             try {
-                $lookup = $this->cache->get(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
+                $encodingKey = base64_encode(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
+                $lookup = $this->cache->get($encodingKey);
 
                 if ($lookup === null) {
                     $lookup = $this->client->searchOrder(subject: $line[$this->subjectMappingField], store: $line[$this->storeMappingField]);
 
-                    $this->cache->set(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]), $lookup);
+                    $this->cache->set($encodingKey, $lookup);
                 }
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
