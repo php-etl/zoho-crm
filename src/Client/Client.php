@@ -81,7 +81,7 @@ class Client implements ClientInterface
                     ->withScheme('https')
             )
             ->withHeader('Content-Type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body]], JSON_THROW_ON_ERROR)))
+            ->withBody($this->streamFactory->createStream(json_encode(['data' => [$body], 'duplicate_check_fields' => ['Subject']], JSON_THROW_ON_ERROR)))
         );
 
         $this->processResponse($response);
@@ -149,7 +149,7 @@ class Client implements ClientInterface
      * @throws ClientExceptionInterface
      * @throws \JsonException
      */
-    public function searchOrder(string $subject): array
+    public function searchOrder(string $subject, string $store): array
     {
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
@@ -157,7 +157,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Sales_Orders/search')
                     ->withQuery(http_build_query([
-                        'criteria' => sprintf('Subject:equals:%s', $subject)
+                        'criteria' => sprintf('((Subject:equals:%s)and(Store:equals:%s))', $subject, $store)
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -177,7 +177,10 @@ class Client implements ClientInterface
     private function processResponse(ResponseInterface $response): void
     {
         if ($response->getStatusCode() === 400) {
-            throw new BadRequestException('The format of the request is not correct. Please check the information sent.');
+            throw new BadRequestException(
+                'The format of the request is not correct. Please check the information sent.',
+                $response,
+            );
         }
 
         if ($response->getStatusCode() === 403) {
