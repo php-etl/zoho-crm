@@ -38,7 +38,7 @@ final class OrderLookup implements TransformerInterface
                 $encodingKey = base64_encode(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
                 $lookup = $this->cache->get($encodingKey);
 
-                if ($lookup === null) {
+                if (null === $lookup) {
                     $lookup = $this->client->searchOrder(subject: $line[$this->subjectMappingField], store: $line[$this->storeMappingField]);
 
                     $this->cache->set($encodingKey, $lookup);
@@ -46,6 +46,7 @@ final class OrderLookup implements TransformerInterface
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
                 $line = yield new RejectionResultBucket($line);
+
                 return;
             } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception]);

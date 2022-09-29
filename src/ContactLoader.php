@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM;
 
-use Kiboko\Component\Bucket\RejectionResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\ApiRateExceededException;
 use Kiboko\Component\Flow\ZohoCRM\Client\BadRequestException;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
@@ -28,9 +27,12 @@ final class ContactLoader implements LoaderInterface
                 $this->client->upsertContacts($line);
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+
                 return;
-            } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
+            } catch (ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+            } catch (BadRequestException $exception) {
+                $this->logger->error($exception->getMessage(), ['response' => $exception->getResponse()->getBody()->getContents()]);
             }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }

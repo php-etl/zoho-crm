@@ -37,7 +37,7 @@ final class ContactLookup implements TransformerInterface
                 $encodedEmail = base64_encode(sprintf('contact.%s', $line[$this->mappingField]));
                 $lookup = $this->cache->get($encodedEmail);
 
-                if ($lookup === null) {
+                if (null === $lookup) {
                     $lookup = $this->client->searchContact(email: $line[$this->mappingField]);
 
                     $this->cache->set($encodedEmail, $lookup);
@@ -45,6 +45,7 @@ final class ContactLookup implements TransformerInterface
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
                 $line = yield new RejectionResultBucket($line);
+
                 return;
             } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception]);

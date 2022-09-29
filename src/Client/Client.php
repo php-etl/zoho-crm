@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM\Client;
 
-use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -99,7 +99,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Products/search')
                     ->withQuery(http_build_query([
-                        'criteria' => sprintf('Product_Code:equals:%s', $code)
+                        'criteria' => sprintf('Product_Code:equals:%s', $code),
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -108,12 +108,13 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
-        if ($response->getStatusCode() === 204) {
+        if (204 === $response->getStatusCode()) {
             throw new NoContentException(sprintf('The product with SKU %s does not exists.', $code));
         }
 
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"][0];
+
+        return $result['data'][0];
     }
 
     /**
@@ -128,7 +129,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Contacts/search')
                     ->withQuery(http_build_query([
-                        'email' => $email
+                        'email' => $email,
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -137,12 +138,13 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
-        if ($response->getStatusCode() === 204) {
+        if (204 === $response->getStatusCode()) {
             throw new NoContentException(sprintf('The contact with email %s does not exists.', $email));
         }
 
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"][0];
+
+        return $result['data'][0];
     }
 
     /**
@@ -157,7 +159,7 @@ class Client implements ClientInterface
                 $this->uriFactory->createUri()
                     ->withPath('/crm/v3/Sales_Orders/search')
                     ->withQuery(http_build_query([
-                        'criteria' => sprintf('((Subject:equals:%s)and(Store:equals:%s))', $subject, $store)
+                        'criteria' => sprintf('((Subject:equals:%s)and(Store:equals:%s))', $subject, $store),
                     ]))
                     ->withHost($this->host)
                     ->withScheme('https')
@@ -166,40 +168,38 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
-        if ($response->getStatusCode() === 204) {
+        if (204 === $response->getStatusCode()) {
             throw new NoContentException(sprintf('The order with subject %s does not exists.', $subject));
         }
 
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"][0];
+
+        return $result['data'][0];
     }
 
     private function processResponse(ResponseInterface $response): void
     {
-        if ($response->getStatusCode() === 400) {
-            throw new BadRequestException(
-                'The format of the request is not correct. Please check the information sent.',
-                $response,
-            );
+        if (400 === $response->getStatusCode()) {
+            throw new BadRequestException('The format of the request is not correct. Please check the information sent.', $response);
         }
 
-        if ($response->getStatusCode() === 403) {
+        if (403 === $response->getStatusCode()) {
             throw new ForbiddenException('You do not have the right to make this request. Please login before making your request or verify your rights.');
         }
 
-        if ($response->getStatusCode() === 404) {
+        if (404 === $response->getStatusCode()) {
             throw new NotFoundException('What you are looking for does not exist. Please check your request.');
         }
 
-        if ($response->getStatusCode() === 413) {
+        if (413 === $response->getStatusCode()) {
             throw new RequestEntityTooLargeException('The maximum size limit of the request has been exceeded. Please check the data sent.');
         }
 
-        if ($response->getStatusCode() === 429) {
+        if (429 === $response->getStatusCode()) {
             throw new ApiRateExceededException('The request rate limit has been exceeded. Please try again later.');
         }
 
-        if ($response->getStatusCode() === 500) {
+        if (500 === $response->getStatusCode()) {
             throw new InternalServerErrorException('The server encountered an unexpected error. Please try again later');
         }
     }
@@ -244,11 +244,12 @@ class Client implements ClientInterface
 
         $this->processResponse($response);
 
-        if ($response->getStatusCode() === 204) {
+        if (204 === $response->getStatusCode()) {
             throw new NoContentException(sprintf('The order with id %s does not exists.', $id));
         }
 
         $result = json_decode($response->getBody()->getContents(), true);
-        return $result["data"][0];
+
+        return $result['data'][0];
     }
 }

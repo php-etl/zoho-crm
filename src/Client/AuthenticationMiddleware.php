@@ -27,7 +27,7 @@ class AuthenticationMiddleware implements ClientInterface
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         $response = $this->tryRequest($request);
-        if ($response->getStatusCode() === 401) {
+        if (401 === $response->getStatusCode()) {
             $this->refreshToken();
 
             $response = $this->tryRequest($request);
@@ -53,7 +53,7 @@ class AuthenticationMiddleware implements ClientInterface
                         'client_id' => $this->clientId,
                         'client_secret' => $this->clientSecret,
                         'refresh_token' => $this->refreshToken,
-                        'grant_type' => 'refresh_token'
+                        'grant_type' => 'refresh_token',
                     ]))
                     ->withPath('/oauth/v2/token')
                     ->withHost($this->oauthBaseUri)
@@ -61,7 +61,7 @@ class AuthenticationMiddleware implements ClientInterface
             )
         );
 
-        if ($response->getStatusCode() !== 200) {
+        if (200 !== $response->getStatusCode()) {
             throw new AccessDeniedException('Something went wrong while refreshing your credentials. Please check your information.');
         }
 
@@ -71,6 +71,6 @@ class AuthenticationMiddleware implements ClientInterface
             throw new InvalidCodeException('Invalid grant token. Please check your information.');
         }
 
-        $this->accessToken = $credentials["access_token"];
+        $this->accessToken = $credentials['access_token'];
     }
 }

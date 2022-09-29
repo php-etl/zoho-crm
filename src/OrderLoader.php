@@ -27,9 +27,12 @@ final class OrderLoader implements LoaderInterface
                 $this->client->upsertOrders($line);
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+
                 return;
-            } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
+            } catch (ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+            } catch (BadRequestException $exception) {
+                $this->logger->error($exception->getMessage(), ['response' => $exception->getResponse()->getBody()->getContents()]);
             }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }

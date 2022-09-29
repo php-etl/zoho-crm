@@ -6,7 +6,6 @@ namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
 use Kiboko\Component\Bucket\RejectionResultBucket;
-use Kiboko\Component\Flow\ZohoCRM\Client\AccessDeniedException;
 use Kiboko\Component\Flow\ZohoCRM\Client\ApiRateExceededException;
 use Kiboko\Component\Flow\ZohoCRM\Client\BadRequestException;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
@@ -39,7 +38,7 @@ final class GetOrderLookup implements TransformerInterface
                 $encodingKey = base64_encode(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
                 $lookup = $this->cache->get($encodingKey);
 
-                if ($lookup === null) {
+                if (null === $lookup) {
                     $lookup = $this->client->searchOrder(subject: $line[$this->subjectMappingField], store: $line[$this->storeMappingField]);
 
                     $this->cache->set($encodingKey, $lookup);
@@ -47,7 +46,7 @@ final class GetOrderLookup implements TransformerInterface
 
                 $result = $lookup;
                 $lookup = $this->cache->get(sprintf('order.%s', $result['id']));
-                if ($lookup === null) {
+                if (null === $lookup) {
                     $lookup = $this->client->getOrder(id: $result['id']);
 
                     $this->cache->set(sprintf('order.%s', $result['id']), $lookup);
@@ -61,6 +60,7 @@ final class GetOrderLookup implements TransformerInterface
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
                 $line = yield new RejectionResultBucket($line);
+
                 return;
             } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception]);

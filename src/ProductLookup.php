@@ -41,7 +41,7 @@ final class ProductLookup implements TransformerInterface
                 try {
                     $lookup = $this->cache->get(sprintf('product.%s', $item[$this->mappingField]));
 
-                    if ($lookup === null) {
+                    if (null === $lookup) {
                         $lookup = $this->client->searchProduct(code: $item[$this->mappingField]);
 
                         $this->cache->set(sprintf('product.%s', $item[$this->mappingField]), $lookup);
@@ -49,6 +49,7 @@ final class ProductLookup implements TransformerInterface
                 } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                     $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
                     $line = yield new RejectionResultBucket($line);
+
                     return;
                 } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
                     $this->logger->error($exception->getMessage(), ['exception' => $exception]);
