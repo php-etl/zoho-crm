@@ -24,7 +24,7 @@ final class DealTransformer implements TransformerInterface
                 $output[] = array_merge($line, $item);
             }
 
-            $line = yield new AcceptanceResultBucket($output);
+            $line = yield new AcceptanceResultBucket(...$output);
         }
     }
 }
