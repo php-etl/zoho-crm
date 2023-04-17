@@ -67,7 +67,7 @@ class AuthenticationMiddleware implements ClientInterface
 
         $credentials = json_decode($response->getBody()->getContents(), true);
 
-        if (array_key_exists('error', $credentials)) {
+        if (\array_key_exists('error', $credentials)) {
             throw new InvalidCodeException('Invalid grant token. Please check your information.');
         }
 
