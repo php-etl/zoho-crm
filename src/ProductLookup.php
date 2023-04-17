@@ -18,11 +18,11 @@ use Kiboko\Contract\Mapping\ArrayMapperInterface;
 use Kiboko\Contract\Pipeline\TransformerInterface;
 use Psr\SimpleCache\CacheInterface;
 
-final class ProductLookup implements TransformerInterface
+final readonly class ProductLookup implements TransformerInterface
 {
     public function __construct(
         private Client $client,
-        private readonly \Psr\Log\LoggerInterface $logger,
+        private \Psr\Log\LoggerInterface $logger,
         private CacheInterface $cache,
         private ArrayMapperInterface $mapper,
         private string $mappingField,
