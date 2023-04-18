@@ -16,7 +16,6 @@ use Kiboko\Component\Flow\ZohoCRM\Client\NotFoundException;
 use Kiboko\Component\Flow\ZohoCRM\Client\RequestEntityTooLargeException;
 use Kiboko\Contract\Mapping\CompiledMapperInterface;
 use Kiboko\Contract\Pipeline\TransformerInterface;
-use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 
 final readonly class ContactLookup implements TransformerInterface
