@@ -13,14 +13,14 @@ use Psr\Http\Message\UriFactoryInterface;
 class AuthenticationMiddleware implements ClientInterface
 {
     public function __construct(
-        private ClientInterface $decorated,
-        private RequestFactoryInterface $requestFactory,
-        private UriFactoryInterface $uriFactory,
-        private string $oauthBaseUri,
-        private string $clientId,
-        private string $clientSecret,
+        private readonly ClientInterface $decorated,
+        private readonly RequestFactoryInterface $requestFactory,
+        private readonly UriFactoryInterface $uriFactory,
+        private readonly string $oauthBaseUri,
+        private readonly string $clientId,
+        private readonly string $clientSecret,
         private string $accessToken,
-        private string $refreshToken,
+        private readonly string $refreshToken,
     ) {
     }
 
@@ -65,9 +65,9 @@ class AuthenticationMiddleware implements ClientInterface
             throw new AccessDeniedException('Something went wrong while refreshing your credentials. Please check your information.');
         }
 
-        $credentials = json_decode($response->getBody()->getContents(), true);
+        $credentials = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
-        if (array_key_exists('error', $credentials)) {
+        if (\array_key_exists('error', $credentials)) {
             throw new InvalidCodeException('Invalid grant token. Please check your information.');
         }
 

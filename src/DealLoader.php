@@ -13,11 +13,11 @@ use Kiboko\Component\Flow\ZohoCRM\Client\NotFoundException;
 use Kiboko\Component\Flow\ZohoCRM\Client\RequestEntityTooLargeException;
 use Kiboko\Contract\Pipeline\LoaderInterface;
 
-final class DealLoader implements LoaderInterface
+final readonly class DealLoader implements LoaderInterface
 {
     public function __construct(
         private Client $client,
-        private readonly \Psr\Log\LoggerInterface $logger,
+        private \Psr\Log\LoggerInterface $logger,
     ) {
     }
 
