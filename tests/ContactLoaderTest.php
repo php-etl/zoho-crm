@@ -24,6 +24,7 @@ final class ContactLoaderTest extends TestCase
 
         $loader = new ContactLoader(
             new Client(
+                'https://example.com',
                 new AuthenticationMiddleware(
                     new \Http\Mock\Client(),
                     $httpFactory,
@@ -31,6 +32,7 @@ final class ContactLoaderTest extends TestCase
                     'https://example.com',
                     '1234567890',
                     '12345678909876432',
+                    '1234567890987654321234567890°',
                     '1234567890987654321234567890°',
                 ),
                 $httpFactory,

@@ -112,7 +112,7 @@ class Client implements ClientInterface
             throw new NoContentException(sprintf('The product with SKU %s does not exists.', $code));
         }
 
-        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         return $result['data'][0];
     }
@@ -142,7 +142,7 @@ class Client implements ClientInterface
             throw new NoContentException(sprintf('The contact with email %s does not exists.', $email));
         }
 
-        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         return $result['data'][0];
     }
@@ -172,7 +172,7 @@ class Client implements ClientInterface
             throw new NoContentException(sprintf('The order with subject %s does not exists.', $subject));
         }
 
-        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         return $result['data'][0];
     }
@@ -248,7 +248,7 @@ class Client implements ClientInterface
             throw new NoContentException(sprintf('The order with id %s does not exists.', $id));
         }
 
-        $result = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         return $result['data'][0];
     }

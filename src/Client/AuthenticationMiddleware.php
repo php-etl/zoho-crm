@@ -65,7 +65,7 @@ class AuthenticationMiddleware implements ClientInterface
             throw new AccessDeniedException('Something went wrong while refreshing your credentials. Please check your information.');
         }
 
-        $credentials = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $credentials = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         if (\array_key_exists('error', $credentials)) {
             throw new InvalidCodeException('Invalid grant token. Please check your information.');
