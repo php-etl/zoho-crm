@@ -28,13 +28,16 @@ final readonly class DealLoader implements LoaderInterface
             try {
                 $this->client->upsertDeals($line);
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
-                $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+                $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
                 return;
             } catch (ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
-                $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+                $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
             } catch (BadRequestException $exception) {
-                $this->logger->error($exception->getMessage(), ['response' => $exception->getResponse()->getBody()->getContents()]);
+                $this->logger->error($exception->getMessage(), [
+                    'response' => $exception->getResponse()->getBody()->getContents(),
+                    'item' => $line,
+                ]);
             }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }

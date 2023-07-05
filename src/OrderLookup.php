@@ -44,12 +44,12 @@ final readonly class OrderLookup implements TransformerInterface
                     $this->cache->set($encodingKey, $lookup);
                 }
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
-                $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
+                $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
 
                 return;
             } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
-                $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+                $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
                 continue;
             }
