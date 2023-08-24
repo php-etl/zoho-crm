@@ -28,6 +28,10 @@ class Client implements ClientInterface
      */
     public function upsertContacts(array $body): void
     {
+        if (empty($body)) {
+            return;
+        }
+
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
@@ -49,6 +53,10 @@ class Client implements ClientInterface
      */
     public function upsertProducts(array $body): void
     {
+        if (empty($body)) {
+            return;
+        }
+
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
@@ -72,6 +80,10 @@ class Client implements ClientInterface
      */
     public function upsertOrders(array $body): void
     {
+        if (empty($body)) {
+            return;
+        }
+
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
@@ -210,6 +222,10 @@ class Client implements ClientInterface
      */
     public function upsertDeals(array $body): void
     {
+        if (empty($body)) {
+            return;
+        }
+
         $response = $this->client->sendRequest(
             $this->requestFactory->createRequest(
                 'POST',
