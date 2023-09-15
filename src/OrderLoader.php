@@ -28,14 +28,16 @@ final readonly class OrderLoader implements LoaderInterface
             } catch (InternalServerErrorException|ApiRateExceededException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
-                return;
+                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
             } catch (ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
-                $this->logger->error($exception->getMessage(), ['exception' => $exception,'item' => $line]);
+                $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
             } catch (BadRequestException $exception) {
                 $this->logger->error($exception->getMessage(), [
                     'response' => $exception->getResponse()->getBody()->getContents(),
                     'item' => $line,
                 ]);
+                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
             }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }
