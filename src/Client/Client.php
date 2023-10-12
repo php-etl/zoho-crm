@@ -44,7 +44,7 @@ class Client implements ClientInterface
             ->withBody($this->streamFactory->createStream(json_encode(['data' => $body], \JSON_THROW_ON_ERROR)))
         );
 
-        $this->processResponse($response);
+        $this->processResponse($response, $body);
     }
 
     /**
@@ -71,7 +71,7 @@ class Client implements ClientInterface
             )
         );
 
-        $this->processResponse($response);
+        $this->processResponse($response, $body);
     }
 
     /**
@@ -96,7 +96,7 @@ class Client implements ClientInterface
             ->withBody($this->streamFactory->createStream(json_encode(['data' => $body, 'duplicate_check_fields' => ['Subject']], \JSON_THROW_ON_ERROR)))
         );
 
-        $this->processResponse($response);
+        $this->processResponse($response, $body);
     }
 
     /**
@@ -189,7 +189,7 @@ class Client implements ClientInterface
         return $result['data'][0];
     }
 
-    private function processResponse(ResponseInterface $response): void
+    private function processResponse(ResponseInterface $response, array|null $body = []): void
     {
         if (400 === $response->getStatusCode()) {
             throw new BadRequestException('The format of the request is not correct. Please check the information sent.', $response);
@@ -213,6 +213,10 @@ class Client implements ClientInterface
 
         if (500 === $response->getStatusCode()) {
             throw new InternalServerErrorException('The server encountered an unexpected error. Please try again later');
+        }
+
+        if (207 === $response->getStatusCode()) {
+            throw new MultiStatusResponseException($response, $body);
         }
     }
 
@@ -238,7 +242,7 @@ class Client implements ClientInterface
                 ->withBody($this->streamFactory->createStream(json_encode(['data' => $body], \JSON_THROW_ON_ERROR)))
         );
 
-        $this->processResponse($response);
+        $this->processResponse($response, $body);
     }
 
     /**
