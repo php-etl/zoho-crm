@@ -20,7 +20,7 @@ class SharedAuthenticationMiddleware
         private readonly string $oauthBaseUri,
         private readonly string $clientId,
         private readonly string $clientSecret,
-        private string $accessToken,
+        private readonly string $accessToken,
         private readonly string $refreshToken,
     ) {
         self::$client = new AuthenticationMiddleware(
