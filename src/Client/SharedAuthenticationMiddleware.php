@@ -12,24 +12,7 @@ use Psr\Http\Message\UriFactoryInterface;
 
 class SharedAuthenticationMiddleware
 {
-    private static ?AuthenticationMiddleware $client = null;
-    private function __construct(
-        private readonly ClientInterface $decorated,
-        private readonly RequestFactoryInterface $requestFactory,
-        private readonly UriFactoryInterface $uriFactory,
-        private readonly string $oauthBaseUri,
-        private readonly string $clientId,
-        private readonly string $clientSecret,
-        private readonly string $accessToken,
-        private readonly string $refreshToken,
-    ) {
-        self::$client = new AuthenticationMiddleware(
-            $this->decorated, $this->requestFactory,
-            $this->uriFactory, $this->oauthBaseUri,
-            $this->clientId, $this->clientSecret,
-            $this->accessToken, $this->refreshToken
-        );
-    }
+    private static ?AuthenticationMiddleware $instance = null;
 
     public static function getInstance(
         ClientInterface $decorated,
@@ -42,9 +25,9 @@ class SharedAuthenticationMiddleware
         string $refreshToken,
     ): AuthenticationMiddleware
     {
-        if (self::$client === null) {
-            new SharedAuthenticationMiddleware($decorated, $requestFactory, $uriFactory, $oauthBaseUri, $clientId, $clientSecret, $accessToken, $refreshToken);
+        if (self::$instance === null) {
+            self::$instance = new AuthenticationMiddleware($decorated, $requestFactory, $uriFactory, $oauthBaseUri, $clientId, $clientSecret, $accessToken, $refreshToken);
         }
-        return self::$client;
+        return self::$instance;
     }
 }
