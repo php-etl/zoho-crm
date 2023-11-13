@@ -54,7 +54,7 @@ final readonly class ProductLookup implements TransformerInterface
                 } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
                     $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                     $line = yield new RejectionResultBucket($line);
-                    continue;
+                    continue 2;
                 }
 
                 $output = ($this->mapper)(
