@@ -28,8 +28,7 @@ final readonly class ProductLookup implements TransformerInterface
         private string $mappingField,
         private string $orderItemsField,
         private string $propertyPath,
-    ) {
-    }
+    ) {}
 
     public function transform(): \Generator
     {
@@ -46,12 +45,12 @@ final readonly class ProductLookup implements TransformerInterface
 
                         $this->cache->set(sprintf('product.%s', $item[$this->mappingField]), $lookup);
                     }
-                } catch (InternalServerErrorException|ApiRateExceededException $exception) {
+                } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                     $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                     $line = yield new RejectionResultBucket($line);
 
                     return;
-                } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
+                } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
                     $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                     $line = yield new RejectionResultBucket($line);
                     continue 2;

@@ -21,8 +21,7 @@ class AuthenticationMiddleware implements ClientInterface
         private readonly string $clientSecret,
         private string $accessToken,
         private readonly string $refreshToken,
-    ) {
-    }
+    ) {}
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
@@ -62,11 +61,7 @@ class AuthenticationMiddleware implements ClientInterface
         );
 
         if (200 !== $response->getStatusCode()) {
-            throw new AccessDeniedException(sprintf(
-                'Something went wrong while refreshing your credentials: %d - "%s"',
-                $response->getStatusCode(),
-                $response->getBody()->getContents(),
-            ));
+            throw new AccessDeniedException(sprintf('Something went wrong while refreshing your credentials: %d - "%s"', $response->getStatusCode(), $response->getBody()->getContents()));
         }
 
         $credentials = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);

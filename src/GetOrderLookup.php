@@ -27,8 +27,7 @@ final readonly class GetOrderLookup implements TransformerInterface
         private CompiledMapperInterface $mapper,
         private string $subjectMappingField,
         private string $storeMappingField,
-    ) {
-    }
+    ) {}
 
     public function transform(): \Generator
     {
@@ -57,12 +56,12 @@ final readonly class GetOrderLookup implements TransformerInterface
                 $line = yield new AcceptanceResultBucket($output);
             } catch (NoContentException) {
                 $line = yield new AcceptanceResultBucket($line);
-            } catch (InternalServerErrorException|ApiRateExceededException $exception) {
+            } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
 
                 return;
-            } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
+            } catch (BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
                 continue;

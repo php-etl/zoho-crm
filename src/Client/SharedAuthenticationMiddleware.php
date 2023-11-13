@@ -6,8 +6,6 @@ namespace Kiboko\Component\Flow\ZohoCRM\Client;
 
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
 class SharedAuthenticationMiddleware
@@ -23,11 +21,11 @@ class SharedAuthenticationMiddleware
         string $clientSecret,
         string $accessToken,
         string $refreshToken,
-    ): AuthenticationMiddleware
-    {
-        if (self::$instance === null) {
+    ): AuthenticationMiddleware {
+        if (null === self::$instance) {
             self::$instance = new AuthenticationMiddleware($decorated, $requestFactory, $uriFactory, $oauthBaseUri, $clientId, $clientSecret, $accessToken, $refreshToken);
         }
+
         return self::$instance;
     }
 }

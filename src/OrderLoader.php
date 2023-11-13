@@ -16,9 +16,7 @@ use Kiboko\Contract\Pipeline\LoaderInterface;
 
 final readonly class OrderLoader implements LoaderInterface
 {
-    public function __construct(private Client $client, private \Psr\Log\LoggerInterface $logger)
-    {
-    }
+    public function __construct(private Client $client, private \Psr\Log\LoggerInterface $logger) {}
 
     public function load(): \Generator
     {
@@ -26,11 +24,11 @@ final readonly class OrderLoader implements LoaderInterface
         do {
             try {
                 $this->client->upsertOrders($line);
-            } catch (InternalServerErrorException|ApiRateExceededException $exception) {
+            } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
                 yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
-            } catch (ForbiddenException|RequestEntityTooLargeException|NotFoundException $exception) {
+            } catch (ForbiddenException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
             } catch (BadRequestException|MultiStatusResponseException $exception) {

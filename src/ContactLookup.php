@@ -26,8 +26,7 @@ final readonly class ContactLookup implements TransformerInterface
         private CacheInterface $cache,
         private CompiledMapperInterface $mapper,
         private string $mappingField,
-    ) {
-    }
+    ) {}
 
     public function transform(): \Generator
     {
@@ -42,12 +41,12 @@ final readonly class ContactLookup implements TransformerInterface
 
                     $this->cache->set($encodedEmail, $lookup);
                 }
-            } catch (InternalServerErrorException|ApiRateExceededException $exception) {
+            } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
 
                 return;
-            } catch (BadRequestException|ForbiddenException|RequestEntityTooLargeException|NotFoundException|NoContentException $exception) {
+            } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket($line);
                 continue;
