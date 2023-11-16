@@ -19,8 +19,7 @@ class Client implements ClientInterface
         private readonly RequestFactoryInterface $requestFactory,
         private readonly UriFactoryInterface $uriFactory,
         private readonly StreamFactoryInterface $streamFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws ClientExceptionInterface
@@ -189,7 +188,7 @@ class Client implements ClientInterface
         return $result['data'][0];
     }
 
-    private function processResponse(ResponseInterface $response, array|null $body = []): void
+    private function processResponse(ResponseInterface $response, null|array $body = []): void
     {
         if (400 === $response->getStatusCode()) {
             throw new BadRequestException('The format of the request is not correct. Please check the information sent.', $response);

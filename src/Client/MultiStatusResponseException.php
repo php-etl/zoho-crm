@@ -8,13 +8,13 @@ use Psr\Http\Message\ResponseInterface;
 
 final class MultiStatusResponseException extends \RuntimeException
 {
-    public function __construct(private readonly ResponseInterface $response, array|null $body = [], int $code = 0, \Throwable|null $previous = null)
+    public function __construct(private readonly ResponseInterface $response, null|array $body = [], int $code = 0, \Throwable $previous = null)
     {
-        $contents = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        $contents = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         $messages = [];
         foreach ($contents['data'] as $key => $item) {
-            if ($item['code'] !== 'SUCCESS') {
+            if ('SUCCESS' !== $item['code']) {
                 $messages[] = [
                     'response' => $item,
                     'body' => $body[$key],
@@ -23,7 +23,7 @@ final class MultiStatusResponseException extends \RuntimeException
         }
 
         parent::__construct(
-            sprintf('Zoho\'s response contains multiple statuses, %d items in the batch may have failed: %s', count($messages), json_encode($messages, JSON_THROW_ON_ERROR)),
+            sprintf('Zoho\'s response contains multiple statuses, %d items in the batch may have failed: %s', \count($messages), json_encode($messages, \JSON_THROW_ON_ERROR)),
             $code,
             $previous
         );

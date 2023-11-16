@@ -11,8 +11,7 @@ final class DealTransformer implements TransformerInterface
 {
     public function __construct(
         private string $orderItemsField,
-    ) {
-    }
+    ) {}
 
     public function transform(): \Generator
     {
