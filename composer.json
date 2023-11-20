@@ -18,8 +18,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "php-etl/pipeline-contracts": "0.4.*",
-        "php-etl/bucket": "*",
+        "php-etl/pipeline-contracts": ">=0.4.0 <0.6",
+        "php-etl/bucket": ">=0.3.0 <0.5",
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
         "php-etl/mapping-contracts": "0.4.*"
