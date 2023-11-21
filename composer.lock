@@ -1721,12 +1721,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-etl/phpunit-extension.git",
-                "reference": "fd1758d8fc3d353de2b3f4e9ba0c1e7af92b19f3"
+                "reference": "5a612872d8a7275adc31be2c8f2f625d341b5326"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-etl/phpunit-extension/zipball/fd1758d8fc3d353de2b3f4e9ba0c1e7af92b19f3",
-                "reference": "fd1758d8fc3d353de2b3f4e9ba0c1e7af92b19f3",
+                "url": "https://api.github.com/repos/php-etl/phpunit-extension/zipball/5a612872d8a7275adc31be2c8f2f625d341b5326",
+                "reference": "5a612872d8a7275adc31be2c8f2f625d341b5326",
                 "shasum": ""
             },
             "require": {
@@ -1773,7 +1773,7 @@
                 "issues": "https://github.com/php-etl/phpunit-extension/issues",
                 "source": "https://github.com/php-etl/phpunit-extension/tree/main"
             },
-            "time": "2023-11-16T15:32:17+00:00"
+            "time": "2023-11-21T12:56:00+00:00"
         },
         {
             "name": "php-http/client-common",
