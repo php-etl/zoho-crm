@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM;
 
+use Kiboko\Component\Bucket\EmptyResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\ApiRateExceededException;
 use Kiboko\Component\Flow\ZohoCRM\Client\BadRequestException;
 use Kiboko\Component\Flow\ZohoCRM\Client\Client;
@@ -24,23 +25,38 @@ final readonly class DealLoader implements LoaderInterface
 
     public function load(): \Generator
     {
-        $line = yield;
+        $line = yield new EmptyResultBucket();
         do {
             try {
                 $this->client->upsertDeals($line);
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
-                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
+                $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
+                    $exception->getMessage(),
+                    $exception,
+                    $line
+                );
+                continue;
             } catch (ForbiddenException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
+                $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
+                    $exception->getMessage(),
+                    $exception,
+                    $line
+                );
+                continue;
             } catch (BadRequestException|MultiStatusResponseException $exception) {
                 $this->logger->error($exception->getMessage(), [
                     'response' => $exception->getResponse()->getBody()->getContents(),
                     'item' => $line,
                 ]);
-                yield new \Kiboko\Component\Bucket\RejectionResultBucket($line);
+                $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
+                    $exception->getMessage(),
+                    $exception,
+                    $line
+                );
+                continue;
             }
         } while ($line = yield new \Kiboko\Component\Bucket\AcceptanceResultBucket($line));
     }

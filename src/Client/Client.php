@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM\Client;
 
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -22,10 +21,6 @@ class Client implements ClientInterface
     ) {
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function upsertContacts(array $body): void
     {
         if (empty($body)) {
@@ -47,10 +42,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function upsertProducts(array $body): void
     {
         if (empty($body)) {
@@ -74,10 +65,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function upsertOrders(array $body): void
     {
         if (empty($body)) {
@@ -99,10 +86,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchProduct(string $code): array
     {
         $response = $this->client->sendRequest(
@@ -132,10 +115,6 @@ class Client implements ClientInterface
         return $result['data'][$index];
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchContact(string $email): array
     {
         $response = $this->client->sendRequest(
@@ -162,10 +141,6 @@ class Client implements ClientInterface
         return $result['data'][0];
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchOrder(string $subject, string $store): array
     {
         $response = $this->client->sendRequest(
@@ -223,10 +198,6 @@ class Client implements ClientInterface
         }
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function upsertDeals(array $body): void
     {
         if (empty($body)) {
@@ -248,10 +219,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function getOrder(string $id): array
     {
         $response = $this->client->sendRequest(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
+use Kiboko\Component\Bucket\EmptyResultBucket;
 use Kiboko\Component\Bucket\RejectionResultBucket;
 use Kiboko\Component\Flow\ZohoCRM\Client\ApiRateExceededException;
 use Kiboko\Component\Flow\ZohoCRM\Client\BadRequestException;
@@ -32,7 +33,9 @@ final readonly class OrderLookup implements TransformerInterface
 
     public function transform(): \Generator
     {
-        $line = yield;
+        $line = yield new EmptyResultBucket();
+
+        /* @phpstan-ignore-next-line */
         while (true) {
             try {
                 $encodingKey = base64_encode(sprintf('order.%s.%s', $line[$this->subjectMappingField], $line[$this->storeMappingField]));
@@ -45,12 +48,20 @@ final readonly class OrderLookup implements TransformerInterface
                 }
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                $line = yield new RejectionResultBucket($line);
+                $line = yield new RejectionResultBucket(
+                    $exception->getMessage(),
+                    $exception,
+                    $line
+                );
 
-                return;
+                continue;
             } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                $line = yield new RejectionResultBucket($line);
+                $line = yield new RejectionResultBucket(
+                    $exception->getMessage(),
+                    $exception,
+                    $line
+                );
                 continue;
             }
 

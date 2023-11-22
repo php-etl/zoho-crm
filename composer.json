@@ -18,11 +18,12 @@
     ],
     "require": {
         "php": "^8.2",
-        "php-etl/pipeline-contracts": ">=0.4.0 <0.6",
-        "php-etl/bucket": ">=0.3.0 <0.5",
+        "php-etl/pipeline-contracts": "0.5.*",
+        "php-etl/bucket": "*",
         "psr/log": "^3.0",
         "psr/simple-cache": "^3.0",
-        "php-etl/mapping-contracts": "0.4.*"
+        "php-etl/mapping-contracts": "0.4.*",
+        "php-etl/bucket-contracts": "0.3.*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -33,12 +34,12 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",
-        "php-etl/phpunit-extension": "*",
+        "php-etl/phpunit-extension": "0.7.*",
         "guzzlehttp/psr7": "^2.4",
         "psr/http-client": "^1.0",
         "psr/http-factory": "^1.0",
         "psr/http-message": "^1.0",
-        "rector/rector": "^0.15.24"
+        "rector/rector": "^0.15"
     },
     "config": {
         "bin-dir": "bin",
