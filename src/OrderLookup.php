@@ -33,6 +33,7 @@ final readonly class OrderLookup implements TransformerInterface
 
     public function transform(): \Generator
     {
+        $lookup = null;
         $line = yield new EmptyResultBucket();
 
         /* @phpstan-ignore-next-line */

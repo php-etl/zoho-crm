@@ -32,6 +32,7 @@ final readonly class ContactLookup implements TransformerInterface
 
     public function transform(): \Generator
     {
+        $lookup = null;
         $line = yield new EmptyResultBucket();
 
         /* @phpstan-ignore-next-line */
