@@ -47,13 +47,11 @@ final readonly class ContactLookup implements TransformerInterface
                 }
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                $line = yield new RejectionResultBucket(
+                yield new RejectionResultBucket(
                     $exception->getMessage(),
                     $exception,
                     $line
                 );
-
-                continue;
             } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket(

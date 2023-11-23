@@ -34,7 +34,7 @@ final readonly class ProductLoader implements LoaderInterface
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
-                $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
+                yield new \Kiboko\Component\Bucket\RejectionResultBucket(
                     $exception->getMessage(),
                     $exception,
                     $line

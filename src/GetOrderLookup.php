@@ -62,13 +62,11 @@ final readonly class GetOrderLookup implements TransformerInterface
                 $line = yield new AcceptanceResultBucket($line);
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
-                $line = yield new RejectionResultBucket(
+                yield new RejectionResultBucket(
                     $exception->getMessage(),
                     $exception,
                     $line
                 );
-
-                continue;
             } catch (BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket(
