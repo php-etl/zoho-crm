@@ -49,30 +49,38 @@ final readonly class ProductLookup implements TransformerInterface
 
                         $this->cache->set(sprintf('product.%s', $item[$this->mappingField]), $lookup);
                     }
+
+                    $output = ($this->mapper)(
+                        $lookup,
+                        $output,
+                        new \Symfony\Component\PropertyAccess\PropertyPath(
+                            sprintf($this->propertyPath, $key)
+                        )
+                    );
                 } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                     $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                     yield new RejectionResultBucket(
-                        $exception->getMessage(),
+                        'It seems that the API request limit has been reached or that there is a problem with the server. Please, retry later.',
                         $exception,
                         $line
                     );
-                } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
+                } catch (BadRequestException|RequestEntityTooLargeException $exception) {
                     $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                     $line = yield new RejectionResultBucket(
-                        $exception->getMessage(),
+                        'It seems that the format of the request is not correct or it is too long. Please check your request and try again.',
+                        $exception,
+                        $line
+                    );
+                    continue 2;
+                } catch (ForbiddenException|NoContentException|NotFoundException $exception) {
+                    $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+                    $line = yield new RejectionResultBucket(
+                        'It seems that the resource does not exist or that you do not have the rights to access this resource. Please check your rights and try again.',
                         $exception,
                         $line
                     );
                     continue 2;
                 }
-
-                $output = ($this->mapper)(
-                    $lookup,
-                    $output,
-                    new \Symfony\Component\PropertyAccess\PropertyPath(
-                        sprintf($this->propertyPath, $key)
-                    )
-                );
             }
 
             $line = yield new AcceptanceResultBucket($output);

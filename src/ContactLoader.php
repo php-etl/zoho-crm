@@ -32,25 +32,36 @@ readonly class ContactLoader implements LoaderInterface
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
 
                 yield new \Kiboko\Component\Bucket\RejectionResultBucket(
-                    $exception->getMessage(),
+                    'It seems that the API request limit has been reached or that there is a problem with the server. Please, retry later.',
                     $exception,
                     $line
                 );
-            } catch (ForbiddenException|NotFoundException|RequestEntityTooLargeException $exception) {
+            } catch (ForbiddenException|NotFoundException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
-                    $exception->getMessage(),
+                    'It seems that the resource does not exist or that you do not have the rights to access this resource. Please check your rights and try again.',
                     $exception,
                     $line
                 );
                 continue;
-            } catch (BadRequestException|MultiStatusResponseException $exception) {
+            } catch (BadRequestException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), [
                     'response' => $exception->getResponse()->getBody()->getContents(),
                     'item' => $line,
                 ]);
                 $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
-                    $exception->getMessage(),
+                    'It seems that the format of the request is not correct or it is too long. Please check your request and try again.',
+                    $exception,
+                    $line
+                );
+                continue;
+            } catch (MultiStatusResponseException $exception) {
+                $this->logger->error($exception->getMessage(), [
+                    'response' => $exception->getResponse()->getBody()->getContents(),
+                    'item' => $line,
+                ]);
+                $line = yield new \Kiboko\Component\Bucket\RejectionResultBucket(
+                    'It seems that one of the resources in the request has failed. Please check your request and try again.',
                     $exception,
                     $line
                 );

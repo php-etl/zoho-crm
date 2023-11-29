@@ -49,14 +49,22 @@ final readonly class ContactLookup implements TransformerInterface
             } catch (ApiRateExceededException|InternalServerErrorException $exception) {
                 $this->logger->critical($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 yield new RejectionResultBucket(
-                    $exception->getMessage(),
+                    'It seems that the API request limit has been reached or that there is a problem with the server. Please, retry later.',
                     $exception,
                     $line
                 );
-            } catch (BadRequestException|ForbiddenException|NoContentException|NotFoundException|RequestEntityTooLargeException $exception) {
+            } catch (BadRequestException|RequestEntityTooLargeException $exception) {
                 $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
                 $line = yield new RejectionResultBucket(
-                    $exception->getMessage(),
+                    'It seems that the format of the request is not correct or it is too long. Please check your request and try again.',
+                    $exception,
+                    $line
+                );
+                continue;
+            } catch (ForbiddenException|NoContentException|NotFoundException $exception) {
+                $this->logger->error($exception->getMessage(), ['exception' => $exception, 'item' => $line]);
+                $line = yield new RejectionResultBucket(
+                    'It seems that the resource does not exist or that you do not have the rights to access this resource. Please check your rights and try again.',
                     $exception,
                     $line
                 );
