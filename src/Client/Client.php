@@ -26,7 +26,7 @@ class Client implements ClientInterface
      * @throws ClientExceptionInterface
      * @throws \JsonException
      * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
-    */
+     */
     public function upsertContacts(array $body): void
     {
         if (empty($body)) {
