@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kiboko\Component\Flow\ZohoCRM\Client;
 
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface as PsrClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -21,6 +22,11 @@ class Client implements ClientInterface
     ) {
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+    */
     public function upsertContacts(array $body): void
     {
         if (empty($body)) {
@@ -42,6 +48,11 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+     */
     public function upsertProducts(array $body): void
     {
         if (empty($body)) {
@@ -65,6 +76,11 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
+    /**
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+     */
     public function upsertOrders(array $body): void
     {
         if (empty($body)) {
