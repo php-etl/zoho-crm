@@ -25,7 +25,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
-     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertContacts(array $body): void
     {
@@ -51,7 +57,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
-     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertProducts(array $body): void
     {
@@ -79,7 +91,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
-     * @throws BadRequestException|ForbiddenException|NotFoundException|RequestEntityTooLargeException|ApiRateExceededException|InternalServerErrorException|MultiStatusResponseException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertOrders(array $body): void
     {
