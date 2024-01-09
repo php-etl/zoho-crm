@@ -21,7 +21,8 @@ class AuthenticationMiddleware implements ClientInterface
         private readonly string $clientSecret,
         private string $accessToken,
         private readonly string $refreshToken,
-    ) {}
+    ) {
+    }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {

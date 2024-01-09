@@ -28,7 +28,8 @@ final readonly class ProductLookup implements TransformerInterface
         private string $mappingField,
         private string $orderItemsField,
         private string $propertyPath,
-    ) {}
+    ) {
+    }
 
     public function transform(): \Generator
     {

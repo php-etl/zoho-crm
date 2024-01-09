@@ -19,7 +19,8 @@ class Client implements ClientInterface
         private readonly RequestFactoryInterface $requestFactory,
         private readonly UriFactoryInterface $uriFactory,
         private readonly StreamFactoryInterface $streamFactory,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws ClientExceptionInterface

@@ -26,7 +26,8 @@ final readonly class ContactLookup implements TransformerInterface
         private CacheInterface $cache,
         private CompiledMapperInterface $mapper,
         private string $mappingField,
-    ) {}
+    ) {
+    }
 
     public function transform(): \Generator
     {
