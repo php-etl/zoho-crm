@@ -27,7 +27,8 @@ final readonly class OrderLookup implements TransformerInterface
         private CompiledMapperInterface $mapper,
         private string $subjectMappingField,
         private string $storeMappingField,
-    ) {}
+    ) {
+    }
 
     public function transform(): \Generator
     {
