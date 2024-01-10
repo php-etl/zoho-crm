@@ -20,8 +20,7 @@ final readonly class ProductLoader implements LoaderInterface
     public function __construct(
         private Client $client,
         private \Psr\Log\LoggerInterface $logger,
-    )
-    {
+    ) {
     }
 
     public function load(): \Generator

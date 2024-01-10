@@ -144,7 +144,7 @@ class Client implements ClientInterface
         $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         // The equals criteria returns a contains response, so we need to make the equals criteria by ourself
-        $index = array_search($code, array_column($result['data'], 'Product_Code')) ?? 0;
+        $index = array_search($code, array_column($result['data'], 'Product_Code')) ?: 0;
 
         return $result['data'][$index];
     }
