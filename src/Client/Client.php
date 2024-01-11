@@ -25,6 +25,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertContacts(array $body): void
     {
@@ -50,6 +57,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertProducts(array $body): void
     {
@@ -77,6 +91,13 @@ class Client implements ClientInterface
     /**
      * @throws ClientExceptionInterface
      * @throws \JsonException
+     * @throws BadRequestException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws RequestEntityTooLargeException
+     * @throws ApiRateExceededException
+     * @throws InternalServerErrorException
+     * @throws MultiStatusResponseException
      */
     public function upsertOrders(array $body): void
     {
@@ -99,10 +120,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchProduct(string $code): array
     {
         $response = $this->client->sendRequest(
@@ -127,15 +144,11 @@ class Client implements ClientInterface
         $result = json_decode($response->getBody()->getContents(), true, 512, \JSON_THROW_ON_ERROR);
 
         // The equals criteria returns a contains response, so we need to make the equals criteria by ourself
-        $index = array_search($code, array_column($result['data'], 'Product_Code')) ?? 0;
+        $index = array_search($code, array_column($result['data'], 'Product_Code')) ?: 0;
 
         return $result['data'][$index];
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchContact(string $email): array
     {
         $response = $this->client->sendRequest(
@@ -162,10 +175,6 @@ class Client implements ClientInterface
         return $result['data'][0];
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function searchOrder(string $subject, string $store): array
     {
         $response = $this->client->sendRequest(
@@ -223,10 +232,6 @@ class Client implements ClientInterface
         }
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function upsertDeals(array $body): void
     {
         if (empty($body)) {
@@ -248,10 +253,6 @@ class Client implements ClientInterface
         $this->processResponse($response, $body);
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function getOrder(string $id): array
     {
         $response = $this->client->sendRequest(

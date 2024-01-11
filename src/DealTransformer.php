@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kiboko\Component\Flow\ZohoCRM;
 
 use Kiboko\Component\Bucket\AcceptanceResultBucket;
+use Kiboko\Component\Bucket\EmptyResultBucket;
 use Kiboko\Contract\Pipeline\TransformerInterface;
 
 final class DealTransformer implements TransformerInterface
@@ -16,7 +17,9 @@ final class DealTransformer implements TransformerInterface
 
     public function transform(): \Generator
     {
-        $line = yield;
+        $line = yield new EmptyResultBucket();
+
+        /* @phpstan-ignore-next-line */
         while (true) {
             $output = [];
             foreach ($line[$this->orderItemsField] as $item) {
